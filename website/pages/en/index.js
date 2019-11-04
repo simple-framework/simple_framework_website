@@ -149,7 +149,7 @@ class Index extends React.Component {
         </Block>
     )
     const Features = () => (
-      <Block layout="fourColumn">
+      <Block layout="fourColumn" background='dark'>
         {[
           {
             content: 'Pick from a curated set of containerized services that abstract low-level configuration requirements.',

@@ -60,7 +60,7 @@ const siteConfig = {
       {
         title: "Cream-CE + Pbs Batch",
         url: "",
-        content: "Cream Compute Element",
+        content: "Cream Compute Element and Torque batch system in a single container",
         image: "/img/infn.png",
         imageAlign: "top"
       },
