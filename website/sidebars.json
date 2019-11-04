@@ -1,8 +1,6 @@
 {
   "docs": {
-    "Docusaurus": ["doc1"],
-    "First Category": ["doc2"],
-    "Second Category": ["doc3"]
+    "Setting up HTCondor Pool with SIMPLE": ["deployment_guide_htcondor"]
   },
   "docs-other": {
     "First Category": ["doc4", "doc5"]
