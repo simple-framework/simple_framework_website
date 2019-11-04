@@ -30,14 +30,15 @@ class HomeSplash extends React.Component {
     );
 
     const Logo = props => (
-      <div className="projectLogo">
-        <img src={props.img_src} alt="Project Logo" />
+      <div>
+        <img src={props.img_src} alt="Project Logo" style={{'height': '300px'}}/>
       </div>
     );
 
     const ProjectTitle = () => (
       <h2 className="projectTitle">
         {siteConfig.title}
+        <Logo img_src={`${baseUrl}img/SIMPLE_Logo.png`} />
         <small>{siteConfig.tagline}</small>
       </h2>
     );
@@ -60,13 +61,11 @@ class HomeSplash extends React.Component {
 
     return (
       <SplashContainer>
-        <Logo img_src={`${baseUrl}img/undraw_monitor.svg`} />
         <div className="inner">
           <ProjectTitle siteConfig={siteConfig} />
           <PromoSection>
             <Button href="#try">Try It Out</Button>
             <Button href={docUrl('doc1.html')}>Example Link</Button>
-            <Button href={docUrl('doc2.html')}>Example Link 2</Button>
           </PromoSection>
         </div>
       </SplashContainer>
@@ -144,15 +143,31 @@ class Index extends React.Component {
         ]}
       </Block>
     );
+    const PoweredBy = () => (
+        <Block>
 
+        </Block>
+    )
     const Features = () => (
       <Block layout="fourColumn">
         {[
           {
+            content: 'Pick from a curated set of containerized services that abstract low-level configuration',
+            image: `${baseUrl}img/docker.svg`,
+            imageAlign: 'top',
+            title: 'Pre-configured services ',
+          },
+          {
+            content: 'Validates your configuration and infrastructure. Save time by avoiding common pitfalls. ',
+            image: `${baseUrl}img/python.svg.png`,
+            imageAlign: 'top',
+            title: 'Validation Engines',
+          },
+          {
             content: 'This is the content of my feature',
             image: `${baseUrl}img/undraw_react.svg`,
             imageAlign: 'top',
-            title: 'Feature One',
+            title: '1 file to define your entire data center',
           },
           {
             content: 'The content of my second feature',
