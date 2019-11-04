@@ -35,7 +35,44 @@ const siteConfig = {
   // For top-level user or org sites, the organization is still the same.
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
   //   organizationName: 'JoelMarcey'
+  supportedServices: [
+      {
+          title: "HTCondor-CE",
+          url: "",
+          content: "HTCondor-CE",
+          image: "/img/htcondor.png",
+          imageAlign: "top"
+      },
+      {
+          title: "HTCondor-Batch",
+          url: "",
+          content: "HTCondor Central Manager",
+          image: "/img/htcondor.png",
+          imageAlign: "top"
+      },
+      {
+        title: "HTCondor-Worker",
+        url: "",
+        content: "HTCondor Execute Nodes",
+        image: "/img/htcondor.png",
+        imageAlign: "top"
+      },
+      {
+        title: "Cream-CE + Pbs Batch",
+        url: "",
+        content: "Cream Compute Element",
+        image: "/img/infn.png",
+        imageAlign: "top"
+      },
+      {
+        title: "Torque Worker Nodes",
+        url: "",
+        content: "Worker nodes based on Torque",
+        image: "/img/pbs.png",
+        imageAlign: "top"
+      },
 
+  ],
   // For no header links in the top nav bar -> headerLinks: [],
   headerLinks: [
     {doc: 'doc1', label: 'Docs'},

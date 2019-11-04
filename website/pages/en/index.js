@@ -152,7 +152,7 @@ class Index extends React.Component {
       <Block layout="fourColumn">
         {[
           {
-            content: 'Pick from a curated set of containerized services that abstract low-level configuration',
+            content: 'Pick from a curated set of containerized services that abstract low-level configuration requirements.',
             image: `${baseUrl}img/docker.svg`,
             imageAlign: 'top',
             title: 'Pre-configured services ',
@@ -164,20 +164,37 @@ class Index extends React.Component {
             title: 'Validation Engines',
           },
           {
-            content: 'This is the content of my feature',
-            image: `${baseUrl}img/undraw_react.svg`,
+            content: 'Comes loaded with sensible default values for commonly used configuration parameters.',
+            image: `${baseUrl}img/yaml.png`,
             imageAlign: 'top',
-            title: '1 file to define your entire data center',
+            title: 'Minimizes configuration',
           },
           {
-            content: 'The content of my second feature',
-            image: `${baseUrl}img/undraw_operating_system.svg`,
+            content: 'Just describe what you want to deploy, and where. We take care of the rest. The user need not be an expert of the underlying tech-stack.',
+            image: `${baseUrl}img/puppet-vector-logo.svg`,
             imageAlign: 'top',
-            title: 'Feature Two',
+            title: 'Abstraction of Tech-Stack',
           },
         ]}
       </Block>
     );
+
+    const SupportedServices = () => {
+        if ((siteConfig.supportedServices || []).length === 0) {
+            return null;
+        }
+        const supportedServices = siteConfig.supportedServices
+        return (
+            <div
+                className=" paddingBottom"
+                style={{textAlign: 'center'}}>
+                <h1>Currently supported WLCG services</h1>
+                <Block  layout="fourColumn">
+                    {supportedServices}
+                </Block>
+            </div>
+        )
+    }
 
     const Showcase = () => {
       if ((siteConfig.users || []).length === 0) {
@@ -213,11 +230,12 @@ class Index extends React.Component {
         <HomeSplash siteConfig={siteConfig} language={language} />
         <div className="mainContainer">
           <Features />
-          <FeatureCallout />
-          <LearnHow />
-          <TryOut />
-          <Description />
-          <Showcase />
+          <SupportedServices/>
+          {/*<FeatureCallout />*/}
+          {/*<LearnHow />*/}
+          {/*<TryOut />*/}
+          {/*<Description />*/}
+          {/*<Showcase />*/}
         </div>
       </div>
     );
