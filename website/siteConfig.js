@@ -23,15 +23,15 @@ const users = [
 const siteConfig = {
   title: 'The SIMPLE Framework', // Title for your website.
   tagline: 'A private PaaS built on top of technologies you like, to simplify the deployment of services you need!',
-  url: 'https://wlcg-ightweight-sites.github.io', // Your website URL
+  url: 'https://simple-framework.github.io', // Your website URL
   baseUrl: '/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',
 
   // Used for publishing and more
-  projectName: 'The SIMPLE Framework',
-  organizationName: 'CERN',
+  projectName: 'simple-framework.github.io',
+  organizationName: 'simple-framework',
   // For top-level user or org sites, the organization is still the same.
   // e.g., for the https://JoelMarcey.github.io site, it would be set like...
   //   organizationName: 'JoelMarcey'
