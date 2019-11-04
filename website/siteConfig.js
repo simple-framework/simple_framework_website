@@ -90,9 +90,9 @@ const siteConfig = {
   users,
 
   /* path to images for header/footer */
-  headerIcon: 'img/favicon.ico',
-  footerIcon: 'img/favicon.ico',
-  favicon: 'img/favicon.ico',
+  headerIcon: 'img/SIMPLE_Logo.png',
+  footerIcon: 'img/SIMPLE_Logo.png',
+  favicon: 'img/SIMPLE_Logo.png',
 
   /* Colors for website */
   colors: {

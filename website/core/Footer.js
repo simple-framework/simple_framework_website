@@ -37,39 +37,38 @@ class Footer extends React.Component {
           </a>
           <div>
             <h5>Docs</h5>
-            <a href={this.docUrl('doc1.html', this.props.language)}>
-              Getting Started (or other categories)
+            {/*<a href={this.docUrl('doc1.html', this.props.language)}>*/}
+            {/*  Getting Started (or other categories)*/}
+            {/*</a>*/}
+            <a href="https://twiki.cern.ch/twiki/bin/view/LCG/SIMPLEGridProject">
+              CERN TWiki
             </a>
-            <a href={this.docUrl('doc2.html', this.props.language)}>
-              Guides (or other categories)
-            </a>
-            <a href={this.docUrl('doc3.html', this.props.language)}>
-              API Reference (or other categories)
+            <a href={this.docUrl('deployment_guide_htcondor.html', this.props.language)}>
+              Deployment Guide: HTCondor
             </a>
           </div>
           <div>
             <h5>Community</h5>
-            <a href={this.pageUrl('users.html', this.props.language)}>
-              User Showcase
+            <a href="https://groups.google.com/forum/#!forum/wlcg-lightweight-sites">
+              Google Groups
             </a>
             <a
-              href="https://stackoverflow.com/questions/tagged/"
+              href="https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY"
               target="_blank"
               rel="noreferrer noopener">
-              Stack Overflow
+              Slack Channel
             </a>
-            <a href="https://discordapp.com/">Project Chat</a>
             <a
-              href="https://twitter.com/"
+              href="https://e-groups.cern.ch/e-groups/Egroup.do?egroupId=10285344"
               target="_blank"
               rel="noreferrer noopener">
-              Twitter
+              CERN E-Groups
             </a>
           </div>
           <div>
             <h5>More</h5>
             <a href={`${this.props.config.baseUrl}blog`}>Blog</a>
-            <a href="https://github.com/">GitHub</a>
+            <a href="https://github.com/simple-framework">GitHub</a>
             <a
               className="github-button"
               href={this.props.config.repoUrl}
@@ -106,12 +105,12 @@ class Footer extends React.Component {
         </section>
 
         <a
-          href="https://opensource.facebook.com/"
+          href="http://wlcg.web.cern.ch/"
           target="_blank"
           rel="noreferrer noopener"
           className="fbOpenSource">
           <img
-            src={`${this.props.config.baseUrl}img/oss_logo.png`}
+            src={`${this.props.config.baseUrl}img/wlcg-logo.png`}
             alt="Facebook Open Source"
             width="170"
             height="45"

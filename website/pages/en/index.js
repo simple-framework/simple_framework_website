@@ -64,8 +64,9 @@ class HomeSplash extends React.Component {
         <div className="inner">
           <ProjectTitle siteConfig={siteConfig} />
           <PromoSection>
-            <Button href="#try">Try It Out</Button>
-            <Button href={docUrl('doc1.html')}>Example Link</Button>
+            {/*<Button href="#try">Try It Out</Button>*/}
+            {/*<Button href={docUrl('deployment_guide_htcondor.html')}> Learn More </Button>*/}
+            <Button href="https://twiki.cern.ch/twiki/bin/view/LCG/SIMPLEGridProject">Learn More</Button>
           </PromoSection>
         </div>
       </SplashContainer>
@@ -178,7 +179,15 @@ class Index extends React.Component {
         ]}
       </Block>
     );
-
+    const UnderConstruction = () => {
+        return (
+            <div style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
+                <img style={{'height': '50px'}} src='img/under_construction.png'/>
+                The site is under construction. Talk to us directly via : <a href='https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY'>Slack</a>
+                <img style={{'height': '50px'}} src='img/under_construction.png'/>
+            </div>
+        )
+    }
     const SupportedServices = () => {
         if ((siteConfig.supportedServices || []).length === 0) {
             return null;
@@ -227,6 +236,7 @@ class Index extends React.Component {
 
     return (
       <div>
+        <UnderConstruction/>
         <HomeSplash siteConfig={siteConfig} language={language} />
         <div className="mainContainer">
           <Features />
