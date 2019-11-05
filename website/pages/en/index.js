@@ -183,7 +183,7 @@ class Index extends React.Component {
         return (
             <div style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
                 <img style={{'height': '50px'}} src='img/under_construction.png'/>
-                The site is under construction. Talk to us directly via : <a href='https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY'>Slack</a>
+                The site is under construction. Talk to us directly (<a href={'help'}>Link</a>)
                 <img style={{'height': '50px'}} src='img/under_construction.png'/>
             </div>
         )
