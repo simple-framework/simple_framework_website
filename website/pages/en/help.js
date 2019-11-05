@@ -31,7 +31,7 @@ function Help(props) {
       title: 'Join the community',
     },
     {
-      content: "Find out what's new with supported services you are interested in. Check out our [GitHub Organization](GitHub)",
+      content: "Find out what's new with supported services you are interested in. Check out our [GitHub Organization](https://github.com/simple-framework)",
       title: 'Stay up to date',
     },
   ];
