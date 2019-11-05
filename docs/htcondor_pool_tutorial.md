@@ -6,7 +6,7 @@ sidebar_label: Deployment Guide: HTCondor
 
 Terminal Captures: https://asciinema.org/~maany
 
-A newer and more in depth version of this tutorial will be uploaded as we update the website. Please [reach out to us directly](../help) and we would be happy to help you get started.
+A newer and more in depth version of this tutorial will be uploaded as we update the website. Please [reach out to us directly](../help) if you need more assistance and we would be happy to help you get started.
 
 ## Preparation of Nodes
 1. Pick a config master node in your infrastructure. We will refer it as CM in the rest of the document. All the other nodes in your infrastructure on which you want to run grid services configured through the SIMPLE Grid framework are lightweight_component nodes of LC nodes.

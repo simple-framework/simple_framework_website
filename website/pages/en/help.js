@@ -22,16 +22,16 @@ function Help(props) {
   const supportLinks = [
     {
       content: `Learn more using the [documentation on this site.](${docUrl(
-        'doc1.html',
-      )})`,
+        'deployment_guide_htcondor.html',
+      )}) or read up our [CERN TWiki page](https://twiki.cern.ch/twiki/bin/view/LCG/SIMPLEGridProject) to get more insights into the project`,
       title: 'Browse Docs',
     },
     {
-      content: 'Ask questions about the documentation and project',
+      content: `Ask questions about the project on [Slack]('https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY'), [Google Groups](https://groups.google.com/forum/#!forum/wlcg-lightweight-sites) or [E-Groups](https://e-groups.cern.ch/e-groups/Egroup.do?egroupId=10285344)`,
       title: 'Join the community',
     },
     {
-      content: "Find out what's new with this project",
+      content: "Find out what's new with supported services you are interested in. Check out our [GitHub Organization](GitHub)",
       title: 'Stay up to date',
     },
   ];
