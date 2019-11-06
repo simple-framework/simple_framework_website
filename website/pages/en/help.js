@@ -45,6 +45,7 @@ function Help(props) {
           </header>
           <p>This project is maintained by a dedicated group of people.</p>
           <p>If none of the options listed below suit you, drop a line with your query/suggestion to mayank [dot] sharma [at] cern [dot] ch.</p>
+
           <GridBlock contents={supportLinks} layout="threeColumn" />
         </div>
       </Container>
