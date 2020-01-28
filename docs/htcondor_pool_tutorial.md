@@ -893,7 +893,66 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
     ```shell script
     puppet agent -t
     ```
+   **Monitoring Deployment**:
+    - Depending on factors like network speed, size of your cluster etc. it might take a while for the deployment to finish.
+        We estimate between 5-20 minutes per container. In the future releases, the deployment time to be significantly cut down.
+    
+    - The component repositories are deployed in order of the **execution_ids** that correspond to their entries in the 
+        site level configuration file. During the pre_deploy_step_1, the images for containers are fetched and then the containers 
+        are started. During pre_deploy_step_2, the grid services inside the containers get configured. Once all LC hosts have reached the final stage,
+        deployment is considered to be completed.
+    
+    - You can check the *simple_stage* fact on all of your LC nodes by using Puppet Bolt as described in the Puppet Bolt section above.
+        ```shell script
+        bolt command run 'puppet facts | grep simple_stage' --nodes @/etc/simple_grid/lc
+        ```    
+    - You can also check the status docker docker images and docker containers on your LC nodes by running the following bolt commands on your CM.
+        ```shell script
+        bolt command run 'docker image ls' --nodes @/etc/simple_grid/lc
+        ```
+        ```shell script
+        bolt command run 'docker ps -a' --nodes @/etc/simple_grid/lc
+        ```
 
+**Note**: If the deployment fails, please take a look at the deployment message and [share the logs](../help) with us, in case they do not make sense.
+You could also try to rollback the deploy stage as and then execute it again with ```puppet agent -t``` command. To rollback deploy stage, 
+execute the following command on the CM:
+```shell script
+puppet apply -e "class{'simple_grid::deploy::config_master::rollback':}"
+```
+
+If everything went well, you now have a production ready HTCondor cluster
+
+## Inspecting the SIMPLE cluster
+
+Let's go to our HTCondor-CE LC hosts. In the example cluster, it is simple-lc-node0.cern.ch.
+To take a look at the running HTCondor-CE container, execute:
+```shell script
+docker ps -a
+```
+
+To get inside the HTCondorCE container, you can run:
+```shell script
+docker exec -it $(docker ps -aq) bash
+```
+
+Once you are in the container:
+1. You can check if condor and condor-ce services are up.
+    ```shell script
+    systemctl status condor-ce
+    systemctl status condor
+    ```
+
+2. You can take a look at the condor_pool, execute 
+    ```shell script
+    condor_status
+    ```
+ 
+3. You can take a look at the queue for the CE
+    ```shell script
+    condor_ce_q
+    ```
+ 
 ## Known Issues
 
 ## FAQs 
