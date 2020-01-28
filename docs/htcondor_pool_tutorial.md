@@ -509,6 +509,9 @@ For the test cluster you set up, you **may** update any or all of the fields bas
 However, you **must** set the **timezone** field. Find your timezone relative to the **/usr/share/zoneinfo**
 directory and put the relative path as the value for the timezone field in the site section.
 
+You must also specify the CVMFS squid/s that should be used by the HTCondor-Workers in the **cvmfs_http_proxy_list** 
+field, as shown.
+
 For the example cluster, the site section looks as follows:
 ```yaml
 site:
@@ -742,52 +745,154 @@ voms_config:
     comment: sgm
 ```
 
-Please modify this section accordingly for your own site level configuration files. 
+Please modify this section accordingly, based on the VOs you support, in your own site level configuration file. 
 The default variables for all four LHC VOs, DTeam and Ops that you can use can be seen in 
 [this file](https://github.com/simple-framework/simple_grid_site_repo/blob/master/site_level_configuration_defaults.yaml).
 
 
-
 ## Simple Installer for CM
-After writing the site level configuration file, run the simple installer on the CM node using to validate your 
-site level configuration file and install/configure various components of the SIMPLE framework on CM:
+After writing the site level configuration file and, preferably, pre-checking it for any compilation errors through the 
+mechanisms mentioned in the previous section, we need to initialize the SIMPLE framework by running the simple installer 
+on the CM node.  
 
-```
+```shell script
 puppet apply --modulepath /etc/puppetlabs/code/environments/production/modules -e 'class{"simple_grid::install::config_master::simple_installer":}'
 ```
-If there are errors related to the site level configuration file, please make the corrections and re-run the command until it executes successfully or get in touch with us to help debug the file.
+
+If you see any errors related to the YAML compiler, please make the corrections in your site level configuration file 
+and re-run the command until it executes successfully or [get in touch with us](../help) to help debug the file.
 
 ## Simple Installer for LC's
-On your LC nodes, you have to connect puppet agents to the puppet server running on the CM node. To do so and also configure the SIMPLE Grid Framework on the LC nodes, run the following command after replacing the 'fqdn of your CM node' with the correct fqdn of your CM node:
 
-```
+On your LC nodes, run the following command to initialize the SIMPLE Framework.
+Remember to change the 'fqdn of your CM node' with the correct fqdn of your CM node.
+
+```shell script
 puppet apply --modulepath /etc/puppetlabs/code/environments/production/modules -e "class {'simple_grid::install::lightweight_component::simple_installer':puppet_master => 'fqdn of your CM node'}"
 ```
 
-## Signing certificate requests from LC's on CM
+## Puppet certificate singing requests from LC's to CM
 
-On your CM node, see the certificate requests from LC's using:
+On your CM node, you will now see the certificate signing requests from LC's using:
  
-```
-puppet cert show -all
+```shell script
+puppet cert list -all
 ```
 
-And sign the certificate requests from the LC nodes using
+Sign the certificate requests from the LC nodes:
 
-```
+```shell script
 puppet cert sign --all
 ```
 
-## Big Red button
-Then on the CM node, to execute the pre_deploy stage of the framework, run
-```
-puppet agent -t
-```
-Continue to the deploy stage by repeating the command again.
+**Note**: If you do not see any certificate signing requests, please check that Port 8140 is open on your CMs firewall 
+and that the LCs can reach the CM over your network. Then try again.
 
+## Some 'Good to Know' things
+
+**Note**: You can skip this section and come back to it if needed. It contains some useful insights into the framework 
+that are good to keep in mind when deploying your cluster.
+
+### Execution Pipeline
+The framework's execution pipeline consists of the following stages for the CM:
+1. **install** : Install framework components
+1. **config**: Configure framework components
+1. **pre_deploy**: Prepare LCs for deploying the grid services
+1. **deploy**: Deploy and Configure containerized grid services
+1. **final**:  The final stage indicating that the grid services have been deployed.
+
+For a LC node, the **pre_deploy** stage is broken down into 3 steps:
+1. pre_deploy_step_1
+1. pre_deploy_step_2
+1. pre_deploy_step_3
+
+And the **deploy** stage is broken down into 2 steps:
+1. deploy_step_1
+1. deploy_step_2
+
+So far, we have completed the **install** and **config** stages for our CM and LC nodes. 
+From now, we shall only interact with the CM node, which will execute and manage the stages appropriately for all the 
+LC nodes. 
+
+To check the stage of any of your CM or LC nodes, you can run the following command:
+```shell script
+puppet facts | grep simple_stage
 ```
-puppet agent -t
+### Puppet Bolt
+After the config stage, you can use Puppet Bolt on your CM to directly execute shell commands and scripts on some or 
+all of your LCs.
+Let's say we wish to check the stage for our nodes, then the bolt command would look as follows:
+```shell script
+bolt command run 'puppet facts| grep simple_stage' --nodes simple-lc-node0.cern.ch, simple-lc-node1.cern.ch, simple-lc-node2.cern.ch, simple-lc-node3.cern.ch
 ```
+This command can be further simplified by creating a text file called, let's say, lc and then adding, one per line, the FQDN of the node
+on which we wish to execute a shell command.
+For our example cluster, we create the lc file as follows:
+```shell script
+vim /etc/simple_grid/lc
+```
+and add the following content to it:
+```text
+simple-lc-node0.cern.ch
+simple-lc-node1.cern.ch
+simple-lc-node2.cern.ch
+simple-lc-node3.cern.ch
+```
+
+Now, the above bolt command can be reduced to:
+
+```shell script
+bolt command run 'puppet facts| grep simple_stage' @/etc/simple_grid/lc
+```
+
+### Execution Pipeline Traversal
+
+#### Forward direction
+The recipes here describe how to go from one stage to another in the execution pipeline.
+
+| Current Stage | Next Stage                | Node Type | Command                                                                                         |
+|---------------|---------------------------|-----------|-------------------------------------------------------------------------------------------------|
+| install       | pre_deploy                | CM        | ```puppet apply -e "class{'simple_grid::install::config_master::simple_installer':}"```         |
+| pre_deploy    | deploy                    | CM        | ```puppet agent -t```                                                                           |
+| deploy        | final                     | CM        | ```puppet agent -t```                                                                           |
+| install       | config/pre_deploy_step_1  | LC*       | ```puppet apply -e "class{'simple_grid::install::lightweight_component::simple_installer':}"``` |
+
+**Note***: The command sets the stage to *config* and puppet agent runs in the background to fetch some additional configuration from the CM. Once that is complete,
+the stage is set to *pre_deploy_step_1*. This command is executed only once per deployment. Since we have executed it in previous steps, we could not have to execute it again.
+
+#### Reverse direction
+Life's not perfect and despite our best efforts we may run into unexpected issues during the framework's execution.
+In the past we have seen network errors or configuration errors which required us to rollback to previous_stages, fix the issues
+and then proceed with the execution pipeline. The table below describes the rollback commands:
+
+| Current Stage | Next Stage | Node Type | Command                                                                                                                                  |
+|---------------|------------|-----------|------------------------------------------------------------------------------------------------------------------------------------------|
+| final         | deploy     | CM        | ```puppet apply -e class{'simple_grid::deploy::config_master::rollback':}"```"                                                          |
+| deploy        | pre_deploy | CM        | ```puppet apply -e class{'simple_grid::pre_deploy::config_master::rollback':}"```"                                                      |
+| pre_deploy    | config     | CM        | ```puppet apply -e class{'simple_grid::config::config_master::rollback':}"```"                                                          |
+| pre_deploy    | config     | LC*       | ```bolt command run "puppet apply -e \"class{'simple_grid::config::lightweight_component::rollback':}\"" --nodes @/etc/simple_grid/lc``` |
+
+**Note***: You might almost never have to rollback the LC's to config stage.
+
+## Execute the Framework
+Now that we have a compilable site level configuration file and have initialized Puppet and the SIMPLE Framework on all
+of the nodes, we can execute the framework to setup our HTCondor Cluster. 
+
+1. On the CM node, to execute the pre_deploy stage of the framework, run
+    ```shell script
+    puppet agent -t
+    ```
+    If something fails, please rollback the CM to pre_deploy stage based on the commands shown in the section above.
+    Here it is again:
+    ```shell script
+    puppet apply -e class{'simple_grid::pre_deploy::config_master::rollback':}"
+    ```
+
+1. On the CM, execute the deploy stage:
+
+    ```shell script
+    puppet agent -t
+    ```
 
 ## Known Issues
 
