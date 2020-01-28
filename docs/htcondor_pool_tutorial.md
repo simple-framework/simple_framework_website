@@ -92,6 +92,8 @@ The recommended requirements for the CM and LC nodes for your HTCondor SIMPLE cl
 
 #### Specs for Example HTCondor SIMPLE cluster on CERN OpenStack
 
+**Note**: The following cluster will be referred to as the **example cluster** in the rest of this tutorial. The terminal captures that we include 
+in this tutorial will be from the example cluster.
 
 | Node Type | FQDN                     | IP address      | HTCondor Role | #cores | RAM(GB) | Swap(GB) | Disk(GB) - Root Filesystem |
 |-----------|--------------------------|-----------------|---------------|--------|---------|----------|----------------------------|
@@ -129,10 +131,12 @@ chmod 644 /etc/simple_grid/host_certificates/$fqdn_of_your_ce/hostcert.pem
 
 In your example cluster, the above commands would look like:
 ```shell script
-chmod 644 /etc/simple_grid/host_certificates/simple-lc-node-0.cern.ch
-chmod 600 /etc/simple_grid/host_certificates/simple-lc-node-0.cern.ch/hostkey.pem
-chmod 644 /etc/simple_grid/host_certificates/simple-lc-node-0.cern.ch/hostcert.pem
+chmod 644 /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch
+chmod 600 /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/hostkey.pem
+chmod 644 /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/hostcert.pem
 ```
+
+[![asciicast](https://asciinema.org/a/296397.svg)](https://asciinema.org/a/296397)
 
 Your host_certificates directly would finally resemble the following (continuing from our example):
 ```shell session
@@ -155,8 +159,8 @@ If not, then a regular Squid must be configured as described [here](http://cernv
 #### SELinux
 After you have identified a CM node and appropriate LC nodes, you must ensure that SELinux is disabled on the nodes. 
 If you prefer to have SELinux enabled, please [get in touch](../help) and we can help figure out the SELinux policy 
-required by Docker and Puppet to function correctly. Otherwise, just ensure that
-sestatus returns disabled. 
+required by Docker and Puppet to function correctly. Otherwise, edit /etc/selinux/config and set SELINUX=disabled. 
+Then, reboot your machine and make sure that output of the command ```sestatus`` is disabled. 
 
 For instance, in our example, on one of the LC nodes: 
 ```shell script
@@ -189,7 +193,7 @@ misconfiguration of network for the nodes in the SIMPLE cluster.
      2020-01-23 14:41:11.130354 WARN  puppetlabs.facter - locale environment variables were bad; continuing with LANG=C LC_ALL=C
      5.5.17
     ```
-
+[![asciicast](https://asciinema.org/a/296405.svg)](https://asciinema.org/a/296405)
 ## Installation of Central Configuration Manager 
 The Central Configuration Manager or CCM in SIMPLE Framework's terminology is a framework component that manages 
 the configuration and deployment of your SIMPLE Cluster. In case of puppet the CCM is the [simple_grid_puppet_module](https://forge.puppet.com/maany/simple_grid)
@@ -199,6 +203,7 @@ using the command below:
 ```shell script
 puppet module install maany-simple_grid
 ```
+[![asciicast](https://asciinema.org/a/296406.svg)](https://asciinema.org/a/296406)
 
 ## Preparing a site level configuration file.
 
