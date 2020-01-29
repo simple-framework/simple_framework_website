@@ -234,20 +234,18 @@ global_variables:
   - &lightweight_component03_fqdn simple-lc-node2.cern.ch
   - &lightweight_component04_ip_address 188.185.78.0
   - &lightweight_component04_fqdn simple-lc-node3.cern.ch
-  - &lightweight_component05_ip_address 188.185.79.162
-  - &lightweight_component05_fqdn simple-lc-node4.cern.ch
 
 htcondor_ce_runtime_variables:
-  - &htcondor_ce_runtime_var_ce_host simple-lc01.cern.ch
+  - &htcondor_ce_runtime_var_ce_host simple-lc-node0.cern.ch
 
 htcondor_batch_runtime_variables:
-  - &htcondor_runtime_var_batch_host simple-lc04.cern.ch
+  - &htcondor_runtime_var_batch_host simple-lc-node1.cern.ch
 
 site:
   name: 'OpenStack SIMPLE dev cluster'
   email: 'mayank.sharma@cern.ch'
-  latitude: -6.50
-  longitude: 106.84
+  latitude: 46.3
+  longitude: 6.2
   location: CERN
   description: 'CERN WLCG Grid by SIMPLE at CERN Openstack'
   website: 'https://home.cern'
@@ -278,8 +276,7 @@ site_infrastructure:
     ip_address: *lightweight_component03_ip_address
   - fqdn: *lightweight_component04_fqdn
     ip_address: *lightweight_component04_ip_address
-  - fqdn: *lightweight_component05_fqdn
-    ip_address: *lightweight_component05_ip_address
+
 
 
 lightweight_components:
@@ -303,7 +300,7 @@ lightweight_components:
       some_param: some_val
   - type: batch_system
     name: HTCondor-Batch
-    repository_url: "https://github.com/andria009/simple_htcondor_batch"
+    repository_url: "https://github.com/simple-framework/simple_htcondor_batch"
     repository_revision: "master"
     execution_id: 1
     lifecycle_hooks:
@@ -337,7 +334,7 @@ lightweight_components:
       level_2_configuration: sh
     config:
       condor_host_execution_id: 1
-      num_slots: 28
+      num_slots: 4
     supplemental_config:
       some_param: some_val
 supported_virtual_organizations:
@@ -381,7 +378,7 @@ voms_config:
 The site level configuration file is compiled by the [simple_grid_yaml_compiler](https://github.com/simple-framework/simple_grid_yaml_compiler).
 It is essential to ensure that your site level configuration file can be successfully compiled by it.
 
-At present, to ensure you can compile your site level configuration file, you must:
+At present, to ensure you can compile your site level configuration file, you can:
 1. [Get in touch](../help) with us directly and we will help compile and fix any errors in the site level configuration file.
 1. Setup [compiler](https://github.com/simple-framework/simple_grid_yaml_compiler) as described [here](https://github.com/simple-framework/simple_grid_yaml_compiler/blob/master/README.md)
 and run it with your site level configuration file as the input.
@@ -400,9 +397,10 @@ for your installation. The sample HTCondor site_level_config_file.yaml is availa
 ```shell script
 puppet apply -e 'class{"simple_grid::install::config_master::simple_installer::create_sample_site_level_config_file":}'
 ```
-
+[![asciicast](https://asciinema.org/a/296526.svg)](https://asciinema.org/a/296526)
 Use any text editor to open the site level configuration file:
 ```shell script
+mkdir -p /etc/simple_grid/site_config
 vim /etc/simple_grid/site_config/site_level_config_file.yaml
 ```
 
@@ -467,20 +465,19 @@ We recommend creating a variable for the fqdn and ip address of each LC node and
 For our example cluster, the global_variables section will look as follows:
 ```yaml
 global_variables:
-  - &condor_ce_ip_address 188.185.115.228
-  - &condor_ce_fqdn simple-lc-node0.cern.ch
-  - &condor_batch_ip_address 188.185.118.59
-  - &condor_batch_fqdn simple-lc-node1.cern.ch
-  - &condor_wn1_ip_address 188.185.112.73
-  - &condor_wn1_fqdn simple-lc-node2.cern.ch
-  - &condor_wn2_ip_address 188.185.78.0
-  - &condor_wn2_fqdn simple-lc-node3.cern.ch
+  - &lightweight_component01_ip_address 188.185.115.228
+  - &lightweight_component01_fqdn simple-lc-node0.cern.ch
+  - &lightweight_component02_ip_address 188.185.118.59
+  - &lightweight_component02_fqdn simple-lc-node1.cern.ch
+  - &lightweight_component03_ip_address 188.185.112.73
+  - &lightweight_component03_fqdn simple-lc-node2.cern.ch
+  - &lightweight_component04_ip_address 188.185.78.0
+  - &lightweight_component04_fqdn simple-lc-node3.cern.ch
 ```
 
 ### runtime_variables
-The runtime variables are an advanced feature of the framework. They enable grid experts to add support to grid services through SIMPLE 
+The runtime variables are an advanced feature of the framework. They enable grid experts who add support for grid services through SIMPLE 
 to request some additional information information from site admins that is required for configuring the grid services.
-
 
 It is necessary to provide a value to these variables to ensure that the containerized services can get configured properly.
 For the HTCondor SIMPLE cluster, we need two runtime_variables, namely, 
@@ -491,10 +488,10 @@ For the HTCondor SIMPLE cluster, we need two runtime_variables, namely,
 In our example, these sections look as follows:
 ```yaml
 htcondor_ce_runtime_variables:
-  - &htcondor_ce_runtime_var_ce_host simple-lc01.cern.ch
+  - &htcondor_ce_runtime_var_ce_host simple-lc-node0.cern.ch
 
 htcondor_batch_runtime_variables:
-  - &htcondor_runtime_var_batch_host simple-lc02.cern.ch
+  - &htcondor_runtime_var_batch_host simple-lc-node1.cern.ch
 ```
 
 Update your site level configuration file to include the *htcondor_ce_runtime_variables* section and assign 
@@ -503,8 +500,6 @@ the *&htcondor_ce_runtime_var_ce_host* variable to point to your HTCondorCE LC h
 
 Then add the *htcondor_batch_runtime_variables* section to your site level configuration and update the value 
 of *&htcondor_runtime_var_batch_host* to point to your HTCondor Batch LC host.
-
-
 
 ### site
 
@@ -540,9 +535,9 @@ site:
 ```
 
 ### preferred_tech_stack
-SIMPLE framework, by design, can be implemented in various popular tools for configuration management, container orchestration, ... 
+SIMPLE framework, by design, can be implemented in various popular tools for configuration management, container orchestration, etc.
 
-This section describes the set of technologies the framework should use to configure the LC hosts and Grid service containers. 
+This section describes the set of technologies the framework should use to configure the LC hosts and HTCondor containers. 
 
 For now, the section can remain unchanged, as the supported technologies do not have any alternatives.
 
@@ -557,7 +552,7 @@ preferred_tech_stack:
 ```
 
 ### site_infrastructure
-In this section, you tell the framework about how to access the LC hosts. If any of your LC hosts have multiple network interfaces,
+In this section, you tell the framework about how to access the LC hosts. If any of your LC hosts have **multiple network interfaces**,
 please use the IP address that corresponds to the interface that can access all the other LC hosts in your network.
 
 For each LC host, you need to make an entry that consists of its fqdn and IPv4 address.
@@ -568,7 +563,8 @@ site_infrastructure:
     ip_address: 188.184.104.25
 ```
 
-If in the global variables section, there already is an entry for these, we could directly use the values of these variables.
+If in the global variables section, if there already exists is an entry for the FQDN and IP addresses of your LC nodes,
+we could directly use the values of these variables.
 Let's say lightweight_component01_fqdn corresponds to simple-lc-node0.cern.ch, while lightweight_component01_ip_address 
 corresponds to 188.184.104.25, then the above section can be re-written as:
 
@@ -590,15 +586,15 @@ site_infrastructure:
     ip_address: *lightweight_component03_ip_address
   - fqdn: *lightweight_component04_fqdn
     ip_address: *lightweight_component04_ip_address
-  - fqdn: *lightweight_component05_fqdn
-    ip_address: *lightweight_component05_ip_address
 ```
 
 ### lightweight_components
-In this section you tell the framework about the configuration of the grid services that should be deployed on the LC hosts, specified in the site_infrastructure section.
-For the SIMPLE HTCondor cluster, these services are the HTCondor-CE, HTCondor-Batch and HTCondor-Workers. 
+In this section you tell the framework about the configuration of the grid services that should be deployed on the LC hosts, 
+specified in the site_infrastructure section. For the SIMPLE HTCondor cluster, these services are the HTCondor-CE, 
+HTCondor-Batch and HTCondor-Workers. 
 
-The following YAML code describes our example HTCondor cluster. You can use it as-is for your own SIMPLE HTCondor cluster after applying the modifications mentioned below:
+The following YAML code describes our example HTCondor cluster. You can use it as-is for your own SIMPLE HTCondor cluster 
+after applying the modifications mentioned below:
 
 ```yaml
 lightweight_components:
@@ -763,9 +759,10 @@ on the CM node.
 ```shell script
 puppet apply --modulepath /etc/puppetlabs/code/environments/production/modules -e 'class{"simple_grid::install::config_master::simple_installer":}'
 ```
+[![asciicast](https://asciinema.org/a/296529.svg)](https://asciinema.org/a/296529)
 
-If you see any errors related to the YAML compiler, please make the corrections in your site level configuration file 
-and re-run the command until it executes successfully or [get in touch with us](../help) to help debug the file.
+If you see any errors related to the YAML compiler, please take a look at the troubleshooting section towards the end of 
+this tutorial. As always, please feel free to [get in touch with us](../help) to help debug the error, if needed. 
 
 ## Simple Installer for LC's
 
@@ -775,6 +772,7 @@ Remember to change the 'fqdn of your CM node' with the correct fqdn of your CM n
 ```shell script
 puppet apply --modulepath /etc/puppetlabs/code/environments/production/modules -e "class {'simple_grid::install::lightweight_component::simple_installer':puppet_master => 'fqdn of your CM node'}"
 ```
+[![asciicast](https://asciinema.org/a/296547.svg)](https://asciinema.org/a/296547)
 
 ## Puppet certificate singing requests from LC's to CM
 
@@ -789,6 +787,8 @@ Sign the certificate requests from the LC nodes:
 ```shell script
 puppet cert sign --all
 ```
+
+[![asciicast](https://asciinema.org/a/296549.svg)](https://asciinema.org/a/296549)
 
 **Note**: If you do not see any certificate signing requests, please check that Port 8140 is open on your CMs firewall 
 and that the LCs can reach the CM over your network. Then try again.
@@ -847,8 +847,10 @@ simple-lc-node3.cern.ch
 Now, the above bolt command can be reduced to:
 
 ```shell script
-bolt command run 'puppet facts| grep simple_stage' @/etc/simple_grid/lc
+bolt command run 'puppet facts| grep simple_stage' --nodes @/etc/simple_grid/lc
 ```
+
+[![asciicast](https://asciinema.org/a/296551.svg)](https://asciinema.org/a/296551)
 
 ### Execution Pipeline Traversal
 
@@ -872,12 +874,15 @@ and then proceed with the execution pipeline. The table below describes the roll
 
 | Current Stage | Next Stage | Node Type | Command                                                                                                                                  |
 |---------------|------------|-----------|------------------------------------------------------------------------------------------------------------------------------------------|
-| final         | deploy     | CM        | ```puppet apply -e class{'simple_grid::deploy::config_master::rollback':}"```"                                                          |
-| deploy        | pre_deploy | CM        | ```puppet apply -e class{'simple_grid::pre_deploy::config_master::rollback':}"```"                                                      |
-| pre_deploy    | config     | CM        | ```puppet apply -e class{'simple_grid::config::config_master::rollback':}"```"                                                          |
-| pre_deploy    | config     | LC*       | ```bolt command run "puppet apply -e \"class{'simple_grid::config::lightweight_component::rollback':}\"" --nodes @/etc/simple_grid/lc``` |
+| final         | deploy     | CM        | ```puppet apply -e "class{'simple_grid::deploy::config_master::rollback':}"```                                                           |
+| final         | deploy     | CM*       | ```puppet apply -e "class{'simple_grid::deploy::config_master::rollback': remove_images => true}"```                                     |
+| deploy        | pre_deploy | CM        | ```puppet apply -e "class{'simple_grid::pre_deploy::config_master::rollback':}"```                                                       |
+| pre_deploy    | config     | CM        | ```puppet apply -e "class{'simple_grid::config::config_master::rollback':}"```                                                           |
+| pre_deploy    | config     | LC**      | ```bolt command run "puppet apply -e \"class{'simple_grid::config::lightweight_component::rollback':}\"" --nodes @/etc/simple_grid/lc``` |
 
-**Note***: You might almost never have to rollback the LC's to config stage.
+**Note** *: Removes HTCondor Docker images from all nodes.
+
+**Note** **: You might almost never have to rollback the LC's to config stage.
 
 ## Execute the Framework
 Now that we have a compilable site level configuration file and have initialized Puppet and the SIMPLE Framework on all
@@ -887,10 +892,13 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
     ```shell script
     puppet agent -t
     ```
+    
+    [![asciicast](https://asciinema.org/a/296553.svg)](https://asciinema.org/a/296553)
+   
     If something fails, please rollback the CM to pre_deploy stage based on the commands shown in the section above.
     Here it is again:
     ```shell script
-    puppet apply -e class{'simple_grid::pre_deploy::config_master::rollback':}"
+    puppet apply -e "class{'simple_grid::pre_deploy::config_master::rollback':}"
     ```
 
 1. On the CM, execute the deploy stage:
@@ -898,6 +906,8 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
     ```shell script
     puppet agent -t
     ```
+   [![asciicast](https://asciinema.org/a/296612.svg)](https://asciinema.org/a/296612)
+   
    **Monitoring Deployment**:
     - Depending on factors like network speed, size of your cluster etc. it might take a while for the deployment to finish.
         We estimate between 5-20 minutes per container. In the future releases, the deployment time to be significantly cut down.
@@ -918,6 +928,7 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
         ```shell script
         bolt command run 'docker ps -a' --nodes @/etc/simple_grid/lc
         ```
+        [![asciicast](https://asciinema.org/a/296613.svg)](https://asciinema.org/a/296613)
 
 **Note**: If the deployment fails, please take a look at the deployment message and [share the logs](../help) with us, in case they do not make sense.
 You could also try to rollback the deploy stage as and then execute it again with ```puppet agent -t``` command. To rollback deploy stage, 
@@ -957,9 +968,104 @@ Once you are in the container:
     ```shell script
     condor_ce_q
     ```
+
+[![asciicast](https://asciinema.org/a/296615.svg)](https://asciinema.org/a/296615)
+
+## Troubleshooting
+If you do not find what you are looking for in this troubleshooting section, please [get in touch](../help) with us and 
+we will help fix your issue and update this guide.
+### YAML compiler fails when running SIMPLE Installer on CM 
+When you run the SIMPLE Installer on the CM and there are compilation errors, the SIMPLE installer would fail with 
+an error like:
+```javascript
+Error: 'bash -c 'source /etc/simple_grid/yaml_compiler/.env/bin/activate && simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml  -o /etc/simple_grid/site_config/augmented_site_level_config_file.yaml -s /etc/simple_grid/site_config/augmented_site_level_config_schema.yaml'' returned 1 instead of one of [0]
+Error: /Stage[main]/Simple_grid::Components::Yaml_compiler::Execute/Exec[execute compiler]/returns: change from 'notrun' to ['0'] failed: 'bash -c 'source /etc/simple_grid/yaml_compiler/.env/bin/activate && simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml  -o /etc/simple_grid/site_config/augmented_site_level_config_file.yaml -s /etc/simple_grid/site_config/augmented_site_level_config_schema.yaml'' returned 1 instead of one of [0]
+```
+Yes, we agree with you that this is a very 'developer' oriented message and not a 'user' oriented error message.
+And yes, we are totally aware that the YAML compiler does not print the best error messages and that it can be 
+daunting to figure out exactly what went wrong. We are working on simplifying this for you in our upcoming releases. 
+In the meantime, please do not hesitate to [get in touch](../help) and we can help resolve any errors.
+
+Below, we discuss some common errors that site admins have encountered in the past
+
+#### Indentation Errors
+YAML is indentation sensitive. Therefore, a consistent use of tabs or spaces throughout the document can help avoid 
+potential indentation errors.
+
+```javascript
+Notice: /Stage[main]/Simple_grid::Components::Yaml_compiler::Execute/Exec[execute compiler]/returns: ruamel.yaml.parser.ParserError: while parsing a block mapping
+Notice: /Stage[main]/Simple_grid::Components::Yaml_compiler::Execute/Exec[execute compiler]/returns:   in "./.temp/runtime.yaml", line 1, column 1
+Notice: /Stage[main]/Simple_grid::Components::Yaml_compiler::Execute/Exec[execute compiler]/returns: expected <block end>, but found u'<block mapping start>'
+Notice: /Stage[main]/Simple_grid::Components::Yaml_compiler::Execute/Exec[execute compiler]/returns:   in "./.temp/runtime.yaml", line 349, column 3
+Error: 'bash -c 'source /etc/simple_grid/yaml_compiler/.env/bin/activate && simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml  -o /etc/simple_grid/site_config/augmented_site_level_config_file.yaml -s /etc/simple_grid/site_config/augmented_site_level_config_schema.yaml'' returned 1 instead of one of [0]
+Error: /Stage[main]/Simple_grid::Components::Yaml_compiler::Execute/Exec[execute compiler]/returns: change from 'notrun' to ['0'] failed: 'bash -c 'source /etc/simple_grid/yaml_compiler/.env/bin/activate && simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml  -o /etc/simple_grid/site_config/augmented_site_level_config_file.yaml -s /etc/simple_grid/site_config/augmented_site_level_config_schema.yaml'' returned 1 instead of one of [0]
+```
+In the lines directly above the error message, you might see a reference to a particular line number in 
+**./temp/runtime.yaml** and a message like: ```expected <block end>, but found u'<block mapping start>'```
  
+This is an indication for potential indentation errors. To identify which line in your site_level_config_file.yaml is 
+causing an indentation error in runtime.yaml, which is the output of one of the compiler's phases, we should inspect runtime.yaml
+
+```shell script
+vim /etc/simple_grid/yaml_compiler/.temp/runtime.yaml
+```
+
+Then go to the line number that was mentioned in the errors message, in this case it is **line 349**
+
+```yaml
+site:
+   name: 'OpenStack SIMPLE dev cluster'
+  email: 'mayank.sharma@cern.ch'
+  latitude: 46.3
+  longitude: 6.2
+```
+
+We notice that the name field in the site section has extra indentation than rest of the fields of the site section.
+Aha! Now, we just go back to our site_level_config_file and can fix the indentation and then run the SIMPLE installer again.
+
+[![asciicast](https://asciinema.org/a/296542.svg)](https://asciinema.org/a/296542)
+
+#### Field/Variable not declared or declared multiple times
+The second most common type of error we have come across is related to redeclaration of fields/variables or missing
+fields/variables. These errors are easier to spot.
+An example of missing field error is:
+```javascript
+tice: /Stage[main]/Simple_grid::Components::Yaml_compiler::Execute/Exec[execute compiler]/returns:     None, None, 'found undefined alias %r' % utf8(alias), event.start_mark
+Notice: /Stage[main]/Simple_grid::Components::Yaml_compiler::Execute/Exec[execute compiler]/returns: ruamel.yaml.composer.ComposerError: found undefined alias 'lightweight_component04_fqdn'
+Notice: /Stage[main]/Simple_grid::Components::Yaml_compiler::Execute/Exec[execute compiler]/returns:   in "./.temp/runtime.yaml", line 380, column 11
+Error: 'bash -c 'source /etc/simple_grid/yaml_compiler/.env/bin/activate && simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml  -o /etc/simple_grid/site_config/augmented_site_level_config_file.yaml -s /etc/simple_grid/site_config/augmented_site_level_config_schema.yaml'' returned 1 instead of one of [0]
+Error: /Stage[main]/Simple_grid::Components::Yaml_compiler::Execute/Exec[execute compiler]/returns: change from 'notrun' to ['0'] failed: 'bash -c 'source /etc/simple_grid/yaml_compiler/.env/bin/activate && simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml  -o /etc/simple_grid/site_config/augmented_site_level_config_file.yaml -s /etc/simple_grid/site_config/augmented_site_level_config_schema.yaml'' returned 1 instead of one of [0]
+```
+Right above the error, you will see a line indication the line and column number in ./.temp/runtime.yaml where the compiler failed.
+Right above that line, you will also see a statement like ```found undefined alias 'lightweight_component04_fqdn'```.
+
+In our example, this already tells us that we have not declared the lightweight_components04_fqdn variable in the site_level_config_file.
+
+We could go to the line mentioned in the error message for the ./temp/runtime.yaml file to see where we are using this 
+variable. In this case, it is in the site_infrastructure section.
+
+Then, we would fix this error by adding the lightweight_component04_fqdn variable under the global_variables section of 
+the site_level_configuration_file.
+
+[![asciicast](https://asciinema.org/a/296543.svg)](https://asciinema.org/a/296543)
+
 ## Known Issues
 
+### Some containers do not start 
+
+We have noticed that sometimes a few of the containers end up in the 'Created' state.
+This behaviour has been observed since we moved to Docker > 19 and we are working on fixing it in our upcoming releases.
+You can track our progress here: [issue_119](https://github.com/simple-framework/simple_grid_puppet_module/issues/119),
+[issue_144](https://github.com/simple-framework/simple_grid_puppet_module/issues/144).
+For a manual fix, please [get in touch](../help) with us.
+
 ## FAQs 
+
+### Can I add new machines, for instance WNs, after deploying a SIMPLE cluster?
+Yes, it is possible to add new LC hosts to your existing SIMPLE cluster. The instructions are about 10-15 steps per node
+at present and we are working to release them as a single command in our upcoming releases. Please [contact us](../help)
+to learn more about how to do this with the current versions of the puppet module. Please also refer to the following issue 
+[issue_130](https://github.com/simple-framework/simple_grid_puppet_module/issues/130)
+
 
 
