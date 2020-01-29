@@ -196,8 +196,8 @@ misconfiguration of network for the nodes in the SIMPLE cluster.
 [![asciicast](https://asciinema.org/a/296405.svg)](https://asciinema.org/a/296405)
 ## Installation of Central Configuration Manager 
 The Central Configuration Manager or CCM in SIMPLE Framework's terminology is a framework component that manages 
-the configuration and deployment of your SIMPLE Cluster. In case of puppet the CCM is the [simple_grid_puppet_module](https://forge.puppet.com/maany/simple_grid)
-On the CM and all of the LC nodes, you will not install the latest [simple_grid_puppet_module](https://forge.puppet.com/maany/simple_grid) from Puppet Forge
+the configuration and deployment of your SIMPLE Cluster. In case of puppet the CCM is the [simple_grid_puppet_module](https://forge.puppet.com/maany/simple_grid).
+On the CM and all of the LC nodes, you will now install the latest [simple_grid_puppet_module](https://forge.puppet.com/maany/simple_grid) from Puppet Forge
 using the command below:
 
 ```shell script
