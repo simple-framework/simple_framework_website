@@ -27,7 +27,7 @@ function Help(props) {
       title: 'Browse Docs',
     },
     {
-      content: `Ask questions about the project on [Slack]('https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY'), [Google Groups](https://groups.google.com/forum/#!forum/wlcg-lightweight-sites) or [E-Groups](https://e-groups.cern.ch/e-groups/Egroup.do?egroupId=10285344)`,
+      content: `Ask questions about the project on [Slack](https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY), [Google Groups](https://groups.google.com/forum/#!forum/wlcg-lightweight-sites) or [E-Groups](https://e-groups.cern.ch/e-groups/Egroup.do?egroupId=10285344)`,
       title: 'Join the community',
     },
     {
