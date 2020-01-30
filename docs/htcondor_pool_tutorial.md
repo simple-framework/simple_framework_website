@@ -380,7 +380,7 @@ It is essential to ensure that your site level configuration file can be success
 
 At present, to ensure you can compile your site level configuration file, you can:
 1. [Get in touch](../help) with us directly and we will help compile and fix any errors in the site level configuration file.
-1. Setup [compiler](https://github.com/simple-framework/simple_grid_yaml_compiler) as described [here](https://github.com/simple-framework/simple_grid_yaml_compiler/blob/master/README.md)
+1. Setup [compiler](https://github.com/simple-framework/simple_grid_yaml_compiler) as described towards the end of this section
 and run it with your site level configuration file as the input.
 
 To simplify the process, we are working on a web based compiler, which will be available soon.
@@ -752,6 +752,22 @@ Please modify this section accordingly, based on the VOs you support, in your ow
 The default variables for all four LHC VOs, DTeam and Ops that you can use can be seen in 
 [this file](https://github.com/simple-framework/simple_grid_site_repo/blob/master/site_level_configuration_defaults.yaml).
 
+## Pre-Compilation
+As mentioned earlier, it is a good practice to pre-compile your site level configuration file and spot any errors early in
+the deployment process.
+
+While are working on a web-based compiler to significantly simplify writing of the site level configuration files, you can 
+use the commands shown below to locally test the compilation of your site level configuration file in the meantime.
+
+```shell script
+mkdir -p simple_grid_yaml_compiler/.temp
+cd simple_grid_yaml_compiler
+pip install simple_grid_yaml_compiler
+simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml -o output.yaml -s schema.yaml
+
+```
+If the compiler runs without any errors, you can proceed with the deployment. If there are errors, please take a look
+at the troubleshooting guide towards the end of this tutorial or [get in touch](../help) with us for further assistance.
 
 ## Simple Installer for CM
 After writing the site level configuration file and, preferably, pre-checking it for any compilation errors through the 
