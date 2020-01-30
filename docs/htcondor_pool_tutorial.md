@@ -477,13 +477,15 @@ global_variables:
 
 ### runtime_variables
 The runtime variables are an advanced feature of the framework. They enable grid experts who add support for grid services through SIMPLE 
-to request some additional information information from site admins that is required for configuring the grid services.
+to request some additional information from site admins that is required for configuring the grid services.
 
 It is necessary to provide a value to these variables to ensure that the containerized services can get configured properly.
 For the HTCondor SIMPLE cluster, we need two runtime_variables, namely, 
 
 - **htcondor_ce_runtime_var_ce_host** : The FQDN of the LC node where you wish to deploy HTCondorCE
 - **htcondor_batch_runtime_var_batch_host**: The FQDN of LC node where you wish to deploy HTCondorBatch
+
+**Note**: In runtime variables, the values of global_variables cannot be used, at present.
 
 In our example, these sections look as follows:
 ```yaml

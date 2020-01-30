@@ -137,6 +137,7 @@ const siteConfig = {
   // Open Graph and Twitter card images.
   ogImage: 'img/undraw_online.svg',
   twitterImage: 'img/undraw_tweetstorm.svg',
+  editUrl: 'https://github.com/simple-framework/simple_framework_website/edit/master/docs/'
 
   // For sites with a sizable amount of content, set collapsible to true.
   // Expand/collapse the links and subcategories under categories.
