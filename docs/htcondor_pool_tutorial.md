@@ -762,7 +762,7 @@ use the commands shown below to locally test the compilation of your site level 
 ```shell script
 mkdir -p simple_grid_yaml_compiler/.temp
 cd simple_grid_yaml_compiler
-pip install simple_grid_yaml_compiler
+pip install simple-grid-yaml-compiler
 simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml -o output.yaml -s schema.yaml
 
 ```
