@@ -11,7 +11,6 @@ jobs:
           command: |
             git config --global user.email "maany@users.noreply.github.com"
             git config --global user.name "maany"
-            export GIT_USER=maany
             echo "machine github.com login maany password $GITHUB_TOKEN" > ~/.netrc
             cd website && yarn install && GIT_USER=<GIT_USER> yarn run publish-gh-page
 
