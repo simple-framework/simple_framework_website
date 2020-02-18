@@ -77,7 +77,7 @@ The recommended requirements for the CM and LC nodes for your HTCondor SIMPLE cl
 | Node Type | HTCondor Role   | # CPU Cores | RAM(GB)                                  | Swap(GB) | Disk(GB) -  Root Filesystem                |
 |-----------|-----------------|-------------|------------------------------------------|----------|--------------------------------------------|
 | CM        | N/A             | 2           | 2*#cores (puppetserver)                  | 1        | 12(image) + 1(puppetserver)                |
-| LC        | HTCondor CE     | 1           | 2(swarm) + 0.1(HTCondor) + 1 (misc)      | 1        | 3(docker) + 5(image)                       |
+| LC        | HTCondor CE     | 1           | 2(swarm) + 0.5(HTCondor) + 1 (misc)      | 1        | 3(docker) + 5(image)                       |
 | LC        | HTCondor Batch  | 1           | 2(swarm) + 0.1(HTCondor) + 1 (misc)      | 1        | 3(docker) + 5(image)                       |
 | LC        | HTCondor Worker | 1           | 2(swarm) + 2*#cores(HTCondor) + 1 (misc) | 3*#cores | 3(docker) + 5(image) + 10*#cores(HTCondor) |
 
@@ -86,7 +86,7 @@ The recommended requirements for the CM and LC nodes for your HTCondor SIMPLE cl
 | Node Type | HTCondor Role   | # CPU Cores | RAM(GB)                                  | Swap(GB) | Disk(GB) - Root Filesystem                 |
 |-----------|-----------------|-------------|------------------------------------------|----------|--------------------------------------------|
 | CM        | N/A             | 4           | 2*#cores (puppetserver) + 2(misc)        | 2        | 12(image) + 2(puppetserver)                |
-| LC        | HTCondor CE     | 1           | 8(swarm) + 0.1(HTCondor) + 1 (misc)      | 1        | 3(docker) + 5(image)                       |
+| LC        | HTCondor CE     | 1           | 8(swarm) + 0.5(HTCondor) + 1 (misc)      | 1        | 3(docker) + 5(image)                       |
 | LC        | HTCondor Batch  | 1           | 8(swarm) + 0.1(HTCondor) + 1 (misc)      | 1        | 3(docker) + 5(image)                       |
 | LC        | HTCondor Worker | 8           | 8(swarm) + 2*#cores(HTCondor) + 1 (misc) | 3*#cores | 3(docker) + 5(image) + 10*#cores(HTCondor) |
 
@@ -139,6 +139,12 @@ chmod 644 /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/hostcert.pe
 [![asciicast](https://asciinema.org/a/296397.svg)](https://asciinema.org/a/296397)
 
 Your host_certificates directly would finally resemble the following (continuing from our example):
+```shell script
+ls -la /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/
+```
+
+The output for which should be:
+
 ```shell session
 $ls -la /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/
 total 8
@@ -164,7 +170,10 @@ Then, reboot your machine and make sure that output of the command ```sestatus``
 
 For instance, in our example, on one of the LC nodes: 
 ```shell script
-[root@simple-lc-node0 ~]# sestatus
+sestatus
+```
+The output should be:
+```
 SELinux status:                 disabled
 ```
 
@@ -184,12 +193,15 @@ misconfiguration of network for the nodes in the SIMPLE cluster.
 1. Install puppet-agent (Puppet 5) on all of your **LC nodes**. For CC7, the commands are:
     ```
     rpm -ivh https://yum.puppetlabs.com/puppet5/puppet5-release-el-7.noarch.rpm
-    yum install puppet-agent
+    yum -y install puppet-agent
     ```
 
 1. Verify that puppet is installed. For instance,
     ```shell script
-    [root@simple-lc-node0 ~]# puppet --version
+     puppet --version
+    ```
+   The output should be something similar to:
+   ```shell script
      2020-01-23 14:41:11.130354 WARN  puppetlabs.facter - locale environment variables were bad; continuing with LANG=C LC_ALL=C
      5.5.17
     ```
@@ -219,6 +231,10 @@ The discussion of these features(variable declaration, splitting of configuratio
 injection of additional config variables for grid services, ...) is out of scope for this tutorial. We are working on a detailed
 guide on writing site level configuration files.
 
+**Note**: The CM node is not specified in the site level configuration file. The site level configuration
+file is hosted on the CM node and specifies what grid services should be deployed on the LC nodes, which are explicitly 
+specified in the file.
+
 Here is what the site level configuration file for our example cluster looks like:
 ```yaml
 ### url of schema
@@ -226,14 +242,14 @@ schema:  "https://raw.githubusercontent.com/WLCG-Lightweight-Sites/simple_grid_s
 
 ### Variable declaration:
 global_variables:
-  - &lightweight_component01_ip_address 188.185.115.228
-  - &lightweight_component01_fqdn simple-lc-node0.cern.ch
-  - &lightweight_component02_ip_address 188.185.118.59
-  - &lightweight_component02_fqdn simple-lc-node1.cern.ch
-  - &lightweight_component03_ip_address 188.185.112.73
-  - &lightweight_component03_fqdn simple-lc-node2.cern.ch
-  - &lightweight_component04_ip_address 188.185.78.0
-  - &lightweight_component04_fqdn simple-lc-node3.cern.ch
+  - &ce_host_ip 188.185.115.228
+  - &ce_host_fqdn simple-lc-node0.cern.ch
+  - &batch_host_ip 188.185.118.59
+  - &batch_host_fqdn simple-lc-node1.cern.ch
+  - &wn1_host_ip 188.185.112.73
+  - &wn1_host_fqdn simple-lc-node2.cern.ch
+  - &wn2_host_ip 188.185.78.0
+  - &wn2_host_fqdn simple-lc-node3.cern.ch
 
 htcondor_ce_runtime_variables:
   - &htcondor_ce_runtime_var_ce_host simple-lc-node0.cern.ch
@@ -243,15 +259,15 @@ htcondor_batch_runtime_variables:
 
 site:
   name: 'OpenStack SIMPLE dev cluster'
-  email: 'mayank.sharma@cern.ch'
+  email: 'admin@my-host.my-domain'
   latitude: 46.3
   longitude: 6.2
   location: CERN
   description: 'CERN WLCG Grid by SIMPLE at CERN Openstack'
   website: 'https://home.cern'
   support_website: 'https://groups.google.com/forum/#!forum/wlcg-lightweight-sites'
-  support_email: 'mayank.sharma@cern.ch'
-  security_email: 'mayank.sharma@cern.ch'
+  support_email: 'admin@my-host.my-domain'
+  security_email: 'admin@my-host.my-domain'
   grid: 'wlcg' #site_other_grid: str(), wlcg, egi,osg
   tier: 3
   bdii_host: bdii.cern.ch
@@ -268,14 +284,14 @@ preferred_tech_stack:
   container: docker
 
 site_infrastructure:
-  - fqdn: *lightweight_component01_fqdn
-    ip_address: *lightweight_component01_ip_address
-  - fqdn: *lightweight_component02_fqdn
-    ip_address: *lightweight_component02_ip_address
-  - fqdn: *lightweight_component03_fqdn
-    ip_address: *lightweight_component03_ip_address
-  - fqdn: *lightweight_component04_fqdn
-    ip_address: *lightweight_component04_ip_address
+  - fqdn: *ce_host_fqdn
+    ip_address: *ce_host_ip
+  - fqdn: *batch_host_fqdn
+    ip_address: *batch_host_ip
+  - fqdn: *wn1_host_fqdn
+    ip_address: *wn1_host_ip
+  - fqdn: *wn2_host_fqdn
+    ip_address: *wn2_host_ip
 
 
 
@@ -290,14 +306,22 @@ lightweight_components:
       pre_init: []
       post_init: []
     deploy:
-      - node: *lightweight_component01_fqdn
+      - node: *ce_host_fqdn
         container_count: 1
     preferred_tech_stack:
       level_2_configuration: sh
     config:
       condor_host_execution_id: 1
     supplemental_config:
-      some_param: some_val
+      #Example of adding HTCondorCE configuration knobs through the site level configuration file.
+      'htcondor-ce':
+        - "MYVAR=VALUE"
+        - ANOTHER_CONDOR_KNOB: VALUE
+      'htcondor':
+        - "MYVAR=VALUE" #Example of adding HTCondor configuration knobs through the site level configuration file.
+      '/etc/hosts':
+        - "10.0.1.100 apel-host.mysite"
+
   - type: batch_system
     name: HTCondor-Batch
     repository_url: "https://github.com/simple-framework/simple_htcondor_batch"
@@ -308,14 +332,18 @@ lightweight_components:
       pre_init: []
       post_init: []
     deploy:
-      - node: *lightweight_component02_fqdn
+      - node: *batch_host_fqdn
         container_count: 1
     preferred_tech_stack:
       level_2_configuration: sh
     config:
       placeholder_param: some_value
     supplemental_config:
-      some_param: some_val
+      'htcondor':
+        - "MYVAR=VALUE" #Example of adding HTCondor configuration knobs through the site level configuration file.
+      '/etc/hosts':
+        - "10.0.1.100 apel-host.mysite"
+
   - type: worker_node
     name: HTCondor-Worker
     repository_url: "https://github.com/simple-framework/simple_htcondor_worker"
@@ -326,17 +354,20 @@ lightweight_components:
       pre_init: []
       post_init: []
     deploy:
-      - node: *lightweight_component03_fqdn
+      - node: *wn1_host_fqdn
         container_count: 1
-      - node: *lightweight_component04_fqdn
+      - node: *wn2_host_fqdn
         container_count: 1
     preferred_tech_stack:
       level_2_configuration: sh
     config:
       condor_host_execution_id: 1
       num_slots: 4
+    # Creating or appending content to new/existing files inside containers through supplemental_config section
     supplemental_config:
-      some_param: some_val
+      "/some_path_in_container": 
+        - "contents to be appended" 
+
 supported_virtual_organizations:
   - *default_vo_alice
   - *default_vo_dteam
@@ -354,8 +385,11 @@ voms_config:
     vo: *default_vo_alice
     comment: sgm
   - voms_fqan: '/dteam'
+    # An example of overriding default variable's initial_uid field. The default variables is declared at:
+    # https://github.com/simple-framework/simple_grid_site_repo/blob/master/site_level_configuration_defaults.yaml
     pool_accounts:
-      - *default_pool_accounts_dteam
+      - <<: *default_pool_accounts_dteam
+        initial_uid: 20020
     vo: *default_vo_dteam
   - voms_fqan: '/dteam/ROLE=lcgadmin'
     pool_accounts:
@@ -398,9 +432,12 @@ for your installation. The sample HTCondor site_level_config_file.yaml is availa
 puppet apply -e 'class{"simple_grid::install::config_master::simple_installer::create_sample_site_level_config_file":}'
 ```
 [![asciicast](https://asciinema.org/a/296526.svg)](https://asciinema.org/a/296526)
-Use any text editor to open the site level configuration file:
+
+In case you decide to not use the puppet command above, please create the following dir: 
 ```shell script
 mkdir -p /etc/simple_grid/site_config
+```
+```shell script
 vim /etc/simple_grid/site_config/site_level_config_file.yaml
 ```
 
@@ -429,13 +466,14 @@ In the sample site level configuration file, you will see that we already have s
 ```yaml
 ### Variable declaration:
 global_variables:
-  - &lightweight_component01_ip_address 188.184.104.25
-  - &lightweight_component01_fqdn simple-lc01.cern.ch
-  - &lightweight_component02_ip_address 188.184.30.19
-  - &lightweight_component02_fqdn simple-lc02.cern.ch
-  - &lightweight_component03_ip_address 188.184.84.189
-  - &lightweight_component03_fqdn simple-lc03.cern.ch
-
+  - &ce_ip 188.184.104.25
+  - &ce_fqdn simple-lc01.cern.ch
+  - &batch_ip 188.184.30.19
+  - &batch_fqdn simple-lc02.cern.ch
+  - &wn1_ip 188.184.84.189
+  - &wn1_fqdn simple-lc03.cern.ch
+  - &wn2_ip 188.184.84.190
+  - &wn2_fqdn simple-lc04.cern.ch
 ```
 To add a new variable, you can just create a new entry under the global_variables section. The new entry 
 would have the following format:
@@ -447,17 +485,19 @@ global_variables:
   - &new_variable_name value_of_the_variable
 ```
 
-Let's create 2 new variables called condor_ce_ip_address and condor_ce_fqdn.
+Let's create 2 new variables called htcondor_wn3_host_ip_address and htcondor_wn3_host_fqdn.
 ```yaml
 global_variables:
-  - &lightweight_component01_ip_address 188.184.104.25
-  - &lightweight_component01_fqdn simple-lc01.cern.ch
-  - &lightweight_component02_ip_address 188.184.30.19
-  - &lightweight_component02_fqdn simple-lc02.cern.ch
-  - &lightweight_component03_ip_address 188.184.84.189
-  - &lightweight_component03_fqdn simple-lc03.cern.ch
-  - &condor_ce_ip_address 188.185.115.228
-  - &condor_ce_fqdn simple-lc-node0.cern.ch
+  - &ce_ip 188.184.104.25
+  - &ce_fqdn simple-lc01.cern.ch
+  - &batch_ip 188.184.30.19
+  - &batch_fqdn simple-lc02.cern.ch
+  - &wn1_ip 188.184.84.189
+  - &wn1_fqdn simple-lc03.cern.ch
+  - &wn2_ip 188.184.84.190
+  - &wn2_fqdn simple-lc04.cern.ch
+  - &htcondor_wn3_host_ip_address 188.185.115.228
+  - &htcondor_wn3_host_fqdn simple-lc-node0.cern.ch
 ```   
 
 We recommend creating a variable for the fqdn and ip address of each LC node and then re-using them throughout the site level configuration wherever required. 
@@ -465,14 +505,14 @@ We recommend creating a variable for the fqdn and ip address of each LC node and
 For our example cluster, the global_variables section will look as follows:
 ```yaml
 global_variables:
-  - &lightweight_component01_ip_address 188.185.115.228
-  - &lightweight_component01_fqdn simple-lc-node0.cern.ch
-  - &lightweight_component02_ip_address 188.185.118.59
-  - &lightweight_component02_fqdn simple-lc-node1.cern.ch
-  - &lightweight_component03_ip_address 188.185.112.73
-  - &lightweight_component03_fqdn simple-lc-node2.cern.ch
-  - &lightweight_component04_ip_address 188.185.78.0
-  - &lightweight_component04_fqdn simple-lc-node3.cern.ch
+  - &ce_host_ip 188.185.115.228
+  - &ce_host_fqdn simple-lc-node0.cern.ch
+  - &batch_host_ip 188.185.118.59
+  - &batch_host_fqdn simple-lc-node1.cern.ch
+  - &wn1_host_ip 188.185.112.73
+  - &wn1_host_fqdn simple-lc-node2.cern.ch
+  - &wn2_host_ip 188.185.78.0
+  - &wn2_host_fqdn simple-lc-node3.cern.ch
 ```
 
 ### runtime_variables
@@ -496,11 +536,11 @@ htcondor_batch_runtime_variables:
   - &htcondor_runtime_var_batch_host simple-lc-node1.cern.ch
 ```
 
-Update your site level configuration file to include the *htcondor_ce_runtime_variables* section and assign 
+Modify your site level configuration file to add/update the *htcondor_ce_runtime_variables* section and assign 
 the *&htcondor_ce_runtime_var_ce_host* variable to point to your HTCondorCE LC host.
 
 
-Then add the *htcondor_batch_runtime_variables* section to your site level configuration and update the value 
+Then add/update the *htcondor_batch_runtime_variables* section in your site level configuration and assign the value 
 of *&htcondor_runtime_var_batch_host* to point to your HTCondor Batch LC host.
 
 ### site
@@ -518,15 +558,15 @@ For the example cluster, the site section looks as follows:
 ```yaml
 site:
   name: 'OpenStack SIMPLE dev cluster'
-  email: 'mayank.sharma@cern.ch'
+  email: 'admin@my-host.my-domain'
   latitude: 46.3
   longitude: 6.2
   location: CERN, Geneva, Switzerland
   description: 'CERN HTCondor cluster by SIMPLE @ CERN Openstack'
   website: 'https://home.cern'
   support_website: 'https://groups.google.com/forum/#!forum/wlcg-lightweight-sites'
-  support_email: 'mayank.sharma@cern.ch'
-  security_email: 'mayank.sharma@cern.ch'
+  support_email: 'admin@my-host.my-domain'
+  security_email: 'admin@my-host.my-domain'
   grid: 'wlcg'
   tier: 3
   bdii_host: bdii.cern.ch
@@ -572,22 +612,22 @@ corresponds to 188.184.104.25, then the above section can be re-written as:
 
 ```yaml
 site_infrastructure:
-  - fqdn: *lightweight_component01_fqdn
-    ip_address: *lightweight_component01_ip_address
+  - fqdn: *ce_host_fqdn
+    ip_address: *ce_host_ip
 ```
 For our example cluster, where we have already declared variables for the IP Addresses and FQDNs for each of our LC hosts,
 this section looks as follows:
 
 ```yaml
 site_infrastructure:
-  - fqdn: *lightweight_component01_fqdn
-    ip_address: *lightweight_component01_ip_address
-  - fqdn: *lightweight_component02_fqdn
-    ip_address: *lightweight_component02_ip_address
-  - fqdn: *lightweight_component03_fqdn
-    ip_address: *lightweight_component03_ip_address
-  - fqdn: *lightweight_component04_fqdn
-    ip_address: *lightweight_component04_ip_address
+  - fqdn: *ce_host_fqdn
+    ip_address: *ce_host_ip
+  - fqdn: *batch_host_fqdn
+    ip_address: *batch_host_ip
+  - fqdn: *wn1_host_fqdn
+    ip_address: *wn1_host_ip
+  - fqdn: *wn2_host_fqdn
+    ip_address: *wn2_host_ip
 ```
 
 ### lightweight_components
@@ -599,64 +639,79 @@ The following YAML code describes our example HTCondor cluster. You can use it a
 after applying the modifications mentioned below:
 
 ```yaml
-lightweight_components:
-  - type: compute_element
-    name: HTCondor-CE
-    repository_url: "https://github.com/simple-framework/simple_htcondor_ce"
-    repository_revision: "master"
-    execution_id: 0
-    lifecycle_hooks:
-      pre_config: []
-      pre_init: []
-      post_init: []
-    deploy:
-      - node: *lightweight_component01_fqdn
-        container_count: 1
-    preferred_tech_stack:
-      level_2_configuration: sh
-    config:
-      condor_host_execution_id: 1
-    supplemental_config:
-      some_param: some_val
-  - type: batch_system
-    name: HTCondor-Batch
-    repository_url: "https://github.com/andria009/simple_htcondor_batch"
-    repository_revision: "master"
-    execution_id: 1
-    lifecycle_hooks:
-      pre_config: []
-      pre_init: []
-      post_init: []
-    deploy:
-      - node: *lightweight_component02_fqdn
-        container_count: 1
-    preferred_tech_stack:
-      level_2_configuration: sh
-    config:
-      placeholder_param: some_value
-    supplemental_config:
-      some_param: some_val
-  - type: worker_node
-    name: HTCondor-Worker
-    repository_url: "https://github.com/simple-framework/simple_htcondor_worker"
-    repository_revision: "master"
-    execution_id: 2
-    lifecycle_hooks:
-      pre_config: []
-      pre_init: []
-      post_init: []
-    deploy:
-      - node: *lightweight_component03_fqdn
-        container_count: 1      
-      - node: *lightweight_component04_fqdn
-        container_count: 1      
-    preferred_tech_stack:
-      level_2_configuration: sh
-    config:
-      condor_host_execution_id: 1
-      num_slots: 4
-    supplemental_config:
-      some_param: some_val
+llightweight_components:
+   - type: compute_element
+     name: HTCondor-CE
+     repository_url: "https://github.com/simple-framework/simple_htcondor_ce"
+     repository_revision: "master"
+     execution_id: 0
+     lifecycle_hooks:
+       pre_config: []
+       pre_init: []
+       post_init: []
+     deploy:
+       - node: *ce_host_fqdn
+         container_count: 1
+     preferred_tech_stack:
+       level_2_configuration: sh
+     config:
+       condor_host_execution_id: 1
+     supplemental_config:
+       #Example of adding HTCondorCE configuration knobs through the site level configuration file.
+       'htcondor-ce':
+         - "MYVAR=VALUE"
+         - ANOTHER_CONDOR_KNOB: VALUE
+       'htcondor':
+         - "MYVAR=VALUE" #Example of adding HTCondor configuration knobs through the site level configuration file.
+       '/etc/hosts':
+         - "10.0.1.100 apel-host.mysite"
+ 
+   - type: batch_system
+     name: HTCondor-Batch
+     repository_url: "https://github.com/simple-framework/simple_htcondor_batch"
+     repository_revision: "master"
+     execution_id: 1
+     lifecycle_hooks:
+       pre_config: []
+       pre_init: []
+       post_init: []
+     deploy:
+       - node: *batch_host_fqdn
+         container_count: 1
+     preferred_tech_stack:
+       level_2_configuration: sh
+     config:
+       placeholder_param: some_value
+     supplemental_config:
+       'htcondor':
+         - "MYVAR=VALUE" #Example of adding HTCondor configuration knobs through the site level configuration file.
+       '/etc/hosts':
+         - "10.0.1.100 apel-host.mysite"
+ 
+   - type: worker_node
+     name: HTCondor-Worker
+     repository_url: "https://github.com/simple-framework/simple_htcondor_worker"
+     repository_revision: "master"
+     execution_id: 2
+     lifecycle_hooks:
+       pre_config: []
+       pre_init: []
+       post_init: []
+     deploy:
+       - node: *wn1_host_fqdn
+         container_count: 1
+       - node: *wn2_host_fqdn
+         container_count: 1
+     preferred_tech_stack:
+       level_2_configuration: sh
+     config:
+       condor_host_execution_id: 1
+       num_slots: 4
+     # Creating or appending content to new/existing files inside containers through supplemental_config section
+     supplemental_config:
+       "/some_path_in_container": 
+         - "contents to be appended" 
+
 ```
 For each of HTCondor-CE, HTCondor-Batch and HTCondor-Worker, please modify the **node field** of the **deploy sections** to point to 
 the corresponding LC node/s in you cluster.
@@ -687,8 +742,10 @@ on your infrastructure.
 - **repository_revision**: The branch/tag on GitHub determining the  component repository version. 
 
 - **config**: This section is where you provide values for variables mentioned in the config-schema.yaml files present 
-at the root of the corresponding component repositories. For HTCondor-CE, the config-schema.yaml is present 
-[here](https://github.com/simple-framework/simple_htcondor_ce/blob/master/config-schema.yaml).
+at the root of the corresponding component repositories. You can access the config-schema.yaml files for 
+[HTCondor-CE](https://github.com/simple-framework/simple_htcondor_ce/blob/master/config-schema.yaml),
+[HTCondor-Batch](https://github.com/simple-framework/simple_htcondor_batch/blob/master/config-schema.yaml) and
+[HTCondor-Worker](https://github.com/simple-framework/simple_htcondor_worker/blob/master/config-schema.yaml).
 
 ### supported_virtual_organizations
 Here you tell the framework about the VOs that your site supports. The framework provides **default VO Configuration 
@@ -727,8 +784,11 @@ voms_config:
     vo: *default_vo_alice
     comment: sgm
   - voms_fqan: '/dteam'
+    # An example of overriding default variable's initial_uid field. The default variables is declared at:
+    # https://github.com/simple-framework/simple_grid_site_repo/blob/master/site_level_configuration_defaults.yaml
     pool_accounts:
-      - *default_pool_accounts_dteam
+      - <<: *default_pool_accounts_dteam
+        initial_uid: 20020
     vo: *default_vo_dteam
   - voms_fqan: '/dteam/ROLE=lcgadmin'
     pool_accounts:
@@ -760,11 +820,13 @@ While are working on a web-based compiler to significantly simplify writing of t
 use the commands shown below to locally test the compilation of your site level configuration file in the meantime.
 
 ```shell script
+cd ~
 mkdir -p simple_grid_yaml_compiler/.temp
 cd simple_grid_yaml_compiler
+yum install -y python-pip
+pip install --upgrade pip
 pip install simple-grid-yaml-compiler
 simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml -o output.yaml -s schema.yaml
-
 ```
 If the compiler runs without any errors, you can proceed with the deployment. If there are errors, please take a look
 at the troubleshooting guide towards the end of this tutorial or [get in touch](../help) with us for further assistance.
@@ -846,7 +908,7 @@ After the config stage, you can use Puppet Bolt on your CM to directly execute s
 all of your LCs.
 Let's say we wish to check the stage for our nodes, then the bolt command would look as follows:
 ```shell script
-bolt command run 'puppet facts| grep simple_stage' --nodes simple-lc-node0.cern.ch, simple-lc-node1.cern.ch, simple-lc-node2.cern.ch, simple-lc-node3.cern.ch
+bolt command run 'puppet facts| grep simple_stage' -t simple-lc-node0.cern.ch,simple-lc-node1.cern.ch,simple-lc-node2.cern.ch,simple-lc-node3.cern.ch
 ```
 This command can be further simplified by creating a text file called, let's say, lc and then adding, one per line, the FQDN of the node
 on which we wish to execute a shell command.
@@ -865,7 +927,7 @@ simple-lc-node3.cern.ch
 Now, the above bolt command can be reduced to:
 
 ```shell script
-bolt command run 'puppet facts| grep simple_stage' --nodes @/etc/simple_grid/lc
+bolt command run 'puppet facts| grep simple_stage' -t @/etc/simple_grid/lc
 ```
 
 [![asciicast](https://asciinema.org/a/296551.svg)](https://asciinema.org/a/296551)
@@ -896,7 +958,7 @@ and then proceed with the execution pipeline. The table below describes the roll
 | final         | deploy     | CM*       | ```puppet apply -e "class{'simple_grid::deploy::config_master::rollback': remove_images => true}"```                                     |
 | deploy        | pre_deploy | CM        | ```puppet apply -e "class{'simple_grid::pre_deploy::config_master::rollback':}"```                                                       |
 | pre_deploy    | config     | CM        | ```puppet apply -e "class{'simple_grid::config::config_master::rollback':}"```                                                           |
-| pre_deploy    | config     | LC**      | ```bolt command run "puppet apply -e \"class{'simple_grid::config::lightweight_component::rollback':}\"" --nodes @/etc/simple_grid/lc``` |
+| pre_deploy    | config     | LC**      | ```bolt command run "puppet apply -e \"class{'simple_grid::config::lightweight_component::rollback':}\"" -t @/etc/simple_grid/lc``` |
 
 **Note** *: Removes HTCondor Docker images from all nodes.
 
@@ -937,14 +999,14 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
     
     - You can check the *simple_stage* fact on all of your LC nodes by using Puppet Bolt as described in the Puppet Bolt section above.
         ```shell script
-        bolt command run 'puppet facts | grep simple_stage' --nodes @/etc/simple_grid/lc
+        bolt command run 'puppet facts | grep simple_stage' -t @/etc/simple_grid/lc
         ```    
     - You can also check the status docker docker images and docker containers on your LC nodes by running the following bolt commands on your CM.
         ```shell script
-        bolt command run 'docker image ls' --nodes @/etc/simple_grid/lc
+        bolt command run 'docker image ls' -t @/etc/simple_grid/lc
         ```
         ```shell script
-        bolt command run 'docker ps -a' --nodes @/etc/simple_grid/lc
+        bolt command run 'docker ps -a' -t @/etc/simple_grid/lc
         ```
         [![asciicast](https://asciinema.org/a/296613.svg)](https://asciinema.org/a/296613)
 
@@ -1033,7 +1095,7 @@ Then go to the line number that was mentioned in the errors message, in this cas
 ```yaml
 site:
    name: 'OpenStack SIMPLE dev cluster'
-  email: 'mayank.sharma@cern.ch'
+  email: 'admin@my-host.my-domain'
   latitude: 46.3
   longitude: 6.2
 ```
