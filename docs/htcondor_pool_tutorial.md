@@ -1042,7 +1042,11 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
         bolt command run 'docker ps -a' -t @/etc/simple_grid/lc
         ```
         [![asciicast](https://asciinema.org/a/296613.svg)](https://asciinema.org/a/296613)
-
+To verify that things look good at the end of the deployment, you can execute the  following command and ensure that the outliers field in the output 
+is empty. 
+```shell script
+bolt task run simple_grid::check_stage augmented_site_level_config_file=/etc/simple_grid/site_config/augmented_site_level_config_file.yaml site_infrastructure_key=site_infrastructure expected_stage=final -t localhost
+```
 **Note**: If the deployment fails, please take a look at the deployment message and [share the logs](../help) with us, in case they do not make sense.
 You could also try to rollback the deploy stage as and then execute it again with ```puppet agent -t``` command. To rollback deploy stage, 
 execute the following command on the CM:
@@ -1050,7 +1054,7 @@ execute the following command on the CM:
 puppet apply -e "class{'simple_grid::deploy::config_master::rollback':}"
 ```
 
-If everything went well, you now have a production ready HTCondor cluster
+If everything went well, you now have a production ready HTCondor cluster. 
 
 ## Inspecting the SIMPLE cluster
 
