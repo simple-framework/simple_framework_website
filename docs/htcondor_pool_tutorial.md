@@ -967,7 +967,23 @@ and then proceed with the execution pipeline. The table below describes the roll
 ## Execute the Framework
 Now that we have a compilable site level configuration file and have initialized Puppet and the SIMPLE Framework on all
 of the nodes, we can execute the framework to setup our HTCondor Cluster. 
-
+1. On the CM node, let's ensure that all the machines are in pre_deploy stage. To do so run the command below:
+    ```shell script
+    bolt task run simple_grid::check_stage augmented_site_level_config_file=/etc/simple_grid/site_config/augmented_site_level_config_file.yaml site_infrastructure_key=site_infrastructure expected_stage=pre_deploy -t localhost
+    ```
+    and observe the outliers field in the output. If the outliers field is empty, that means all machines are in pre_deploy stage
+    and we can proceed to execute the stage. For instance:
+    ```shell script
+        {
+            "expected_stage": "deploy",
+            "outliers": [
+    
+            ]
+        }
+     ```
+    Otherwise, the outliers field will enlist the FQDN and stage of the machines that are not in pre_deploy stage yet.
+    In that case, please verify that you have signed puppet certificates for all LC hosts. Try running ```puppet agent -t```
+    on the LC hosts that are outliers and [share any errors](../help) with us. 
 1. On the CM node, to execute the pre_deploy stage of the framework, run
     ```shell script
     puppet agent -t
@@ -975,6 +991,23 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
     
     [![asciicast](https://asciinema.org/a/296553.svg)](https://asciinema.org/a/296553)
    
+    You can run the following bolt task to check if all the nodes are now in the deploy stage:
+    ```shell script
+    bolt task run simple_grid::check_stage augmented_site_level_config_file=/etc/simple_grid/site_config/augmented_site_level_config_file.yaml \
+    site_infrastructure_key=site_infrastructure expected_stage=deploy -t localhost
+    ```
+    If the pre_deploy stage ran successfully, you will see an empty list of outliers in the output. 
+    ```shell script
+    {
+        "expected_stage": "deploy",
+        "outliers": [
+
+        ]
+    }
+    ```
+    Otherwise, the outliers field in the output 
+    would include the fqdn and stage of all the machines that are in the incorrect stage.
+       
     If something fails, please rollback the CM to pre_deploy stage based on the commands shown in the section above.
     Here it is again:
     ```shell script
