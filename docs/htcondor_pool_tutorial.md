@@ -975,7 +975,7 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
     and we can proceed to execute the stage. For instance:
     ```shell script
         {
-            "expected_stage": "deploy",
+            "expected_stage": "pre_deploy",
             "outliers": [
     
             ]
