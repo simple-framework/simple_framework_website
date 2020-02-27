@@ -124,14 +124,14 @@ Inside this newly created directory, place the hostkey.pem and hostcert.pem for 
 You can optionally change the permissions on your hostkey.pem and hostcert.pem as follows
 
 ```shell script
-chmod 644 /etc/simple_grid/host_certificates/$fqdn_of_your_ce
+chmod 755 /etc/simple_grid/host_certificates/$fqdn_of_your_ce
 chmod 600 /etc/simple_grid/host_certificates/$fqdn_of_your_ce/hostkey.pem
 chmod 644 /etc/simple_grid/host_certificates/$fqdn_of_your_ce/hostcert.pem
 ```
 
 In your example cluster, the above commands would look like:
 ```shell script
-chmod 644 /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch
+chmod 755 /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch
 chmod 600 /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/hostkey.pem
 chmod 644 /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/hostcert.pem
 ```
