@@ -491,6 +491,7 @@ global_variables:
   - &ce_fqdn simple-lc01.cern.ch
   - &batch_ip 188.184.30.19
   - &batch_fqdn simple-lc02.cern.ch
+  - &batch_fqdn simple-lc02.cern.ch
   - &wn1_ip 188.184.84.189
   - &wn1_fqdn simple-lc03.cern.ch
   - &wn2_ip 188.184.84.190
@@ -831,6 +832,7 @@ pip install simple-grid-yaml-compiler
 simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml -o output.yaml -s schema.yaml >compiler.out 2>compiler.err
 $?
 deactivate
+pip uninstall virtualenv
 cd ~
 ```
 If the compiler runs without any errors (i.e. the exit code is 0), you can proceed with the deployment. If there are errors, please take a look
