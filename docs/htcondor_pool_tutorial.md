@@ -825,8 +825,12 @@ mkdir -p simple_grid_yaml_compiler/.temp
 cd simple_grid_yaml_compiler
 yum install -y python-pip
 pip install --upgrade pip
+pip install virtualenv
+virtualenv .env
+source ./.env/bin/activate
 pip install simple-grid-yaml-compiler
 simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml -o output.yaml -s schema.yaml
+deactivate
 ```
 If the compiler runs without any errors, you can proceed with the deployment. If there are errors, please take a look
 at the troubleshooting guide towards the end of this tutorial or [get in touch](../help) with us for further assistance.
@@ -983,7 +987,12 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
      ```
     Otherwise, the outliers field will enlist the FQDN and stage of the machines that are not in pre_deploy stage yet.
     In that case, please verify that you have signed puppet certificates for all LC hosts. Try running ```puppet agent -t```
-    on the LC hosts that are outliers and [share any errors](../help) with us. 
+    on the LC hosts that are outliers and [share any errors](../help) with us.
+    If the command fails, it is probably due to the facts that bolt is being configured by puppet in the background.
+    Please wait for a while for this to finish and try again. You can also tail the /var/log/messages to see what puppet is doing.
+    ```shell script
+    tail -f /var/log/messages
+    ```
 1. On the CM node, to execute the pre_deploy stage of the framework, run
     ```shell script
     puppet agent -t
