@@ -202,7 +202,6 @@ misconfiguration of network for the nodes in the SIMPLE cluster.
     ```
    The output should be something similar to:
    ```shell script
-     2020-01-23 14:41:11.130354 WARN  puppetlabs.facter - locale environment variables were bad; continuing with LANG=C LC_ALL=C
      5.5.17
     ```
 [![asciicast](https://asciinema.org/a/296405.svg)](https://asciinema.org/a/296405)
@@ -829,10 +828,12 @@ pip install virtualenv
 virtualenv .env
 source ./.env/bin/activate
 pip install simple-grid-yaml-compiler
-simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml -o output.yaml -s schema.yaml
+simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml -o output.yaml -s schema.yaml >compiler.out 2>compiler.err
+$?
 deactivate
+cd ~
 ```
-If the compiler runs without any errors, you can proceed with the deployment. If there are errors, please take a look
+If the compiler runs without any errors (i.e. the exit code is 0), you can proceed with the deployment. If there are errors, please take a look
 at the troubleshooting guide towards the end of this tutorial or [get in touch](../help) with us for further assistance.
 
 ## Simple Installer for CM
