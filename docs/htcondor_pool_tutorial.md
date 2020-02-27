@@ -148,7 +148,7 @@ The output for which should be:
 ```shell session
 $ls -la /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/
 total 8
-drw-r--r-- 2 root root   45 Jan 23 15:12 .
+drwxrw-rw- 2 root root   45 Jan 23 15:12 .
 drwxr-xr-x 4 root root   69 Jan 23 15:12 ..
 -rw-r--r-- 1 root root 3060 Jan 23 15:12 hostcert.pem
 -rw------- 1 root root 1828 Jan 23 15:12 hostkey.pem
