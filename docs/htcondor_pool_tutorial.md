@@ -1005,7 +1005,7 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
     ```shell script
     puppet apply -e "class{'simple_grid::pre_deploy::config_master::rollback':}
     ```
-    In the outliers represent any of the LC hosts, please verify that you have signed puppet certificates for all LC hosts. Then try running ```puppet agent -t```
+    If the outliers represent any of the LC hosts, please verify that you have signed puppet certificates for all LC hosts. Then try running ```puppet agent -t```
     on the LC hosts that are outliers and [share any errors](../help) with us.
     If, however, the bolt command itself fails, it is probably due to the facts that bolt is being configured by puppet in the background.
     Please wait for a while for this to finish and try again. You can also tail the /var/log/messages to see what puppet is doing.
