@@ -58,12 +58,12 @@ class Footer extends React.Component {
               rel="noreferrer noopener">
               Slack Channel
             </a>
-            <a
-              href="https://e-groups.cern.ch/e-groups/Egroup.do?egroupId=10285344"
-              target="_blank"
-              rel="noreferrer noopener">
-              CERN E-Groups
-            </a>
+            {/*<a*/}
+            {/*  href="https://e-groups.cern.ch/e-groups/Egroup.do?egroupId=10285344"*/}
+            {/*  target="_blank"*/}
+            {/*  rel="noreferrer noopener">*/}
+            {/*  CERN E-Groups*/}
+            {/*</a>*/}
           </div>
           <div>
             <h5>More</h5>
