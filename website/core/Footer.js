@@ -40,8 +40,8 @@ class Footer extends React.Component {
             {/*<a href={this.docUrl('doc1.html', this.props.language)}>*/}
             {/*  Getting Started (or other categories)*/}
             {/*</a>*/}
-            <a href="https://twiki.cern.ch/twiki/bin/view/LCG/SIMPLEGridProject">
-              CERN TWiki
+            <a href="https://indico.cern.ch/event/869667/contributions/3670162/">
+              Introduction to SIMPLE
             </a>
             <a href={this.docUrl('deployment_guide_htcondor.html', this.props.language)}>
               Deployment Guide: HTCondor
@@ -49,8 +49,8 @@ class Footer extends React.Component {
           </div>
           <div>
             <h5>Community</h5>
-            <a href="https://groups.google.com/forum/#!forum/wlcg-lightweight-sites">
-              Google Groups
+            <a href="mailto:mayank.sharma@cern.ch?Subject=Query about SIMPLE Framework">
+              Email
             </a>
             <a
               href="https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY"
@@ -111,7 +111,7 @@ class Footer extends React.Component {
           className="fbOpenSource">
           <img
             src={`${this.props.config.baseUrl}img/wlcg-logo.png`}
-            alt="Facebook Open Source"
+            alt="WLCG Logo"
             width="170"
             height="45"
           />

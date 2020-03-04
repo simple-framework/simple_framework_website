@@ -23,11 +23,11 @@ function Help(props) {
     {
       content: `Learn more using the [documentation on this site.](${docUrl(
         'deployment_guide_htcondor.html',
-      )}) or read up our [CERN TWiki page](https://twiki.cern.ch/twiki/bin/view/LCG/SIMPLEGridProject) to get more insights into the project`,
+      )}) or go through this [presentation](https://indico.cern.ch/event/869667/contributions/3670162/) from WLCG Operations Coordination meeting to get more insights into the project`,
       title: 'Browse Docs',
     },
     {
-      content: `Ask questions about the project on [Slack](https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY), [Google Groups](https://groups.google.com/forum/#!forum/wlcg-lightweight-sites) or [E-Groups](https://e-groups.cern.ch/e-groups/Egroup.do?egroupId=10285344)`,
+      content: `Ask any questions about the project on [Slack](https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY) or [E-Groups](https://e-groups.cern.ch/e-groups/Egroup.do?egroupId=10285344)`,
       title: 'Join the community',
     },
     {

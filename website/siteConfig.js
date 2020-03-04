@@ -57,20 +57,20 @@ const siteConfig = {
         image: "/img/htcondor.png",
         imageAlign: "top"
       },
-      {
-        title: "Cream-CE + Pbs Batch",
-        url: "",
-        content: "Cream Compute Element and Torque batch system in a single container",
-        image: "/img/infn.png",
-        imageAlign: "top"
-      },
-      {
-        title: "Torque Worker Nodes",
-        url: "",
-        content: "Worker nodes based on Torque",
-        image: "/img/pbs.png",
-        imageAlign: "top"
-      },
+      // {
+      //   title: "Cream-CE + Pbs Batch",
+      //   url: "",
+      //   content: "Cream Compute Element and Torque batch system in a single container",
+      //   image: "/img/infn.png",
+      //   imageAlign: "top"
+      // },
+      // {
+      //   title: "Torque Worker Nodes",
+      //   url: "",
+      //   content: "Worker nodes based on Torque",
+      //   image: "/img/pbs.png",
+      //   imageAlign: "top"
+      // },
 
   ],
   // For no header links in the top nav bar -> headerLinks: [],
@@ -137,7 +137,7 @@ const siteConfig = {
   // Open Graph and Twitter card images.
   ogImage: 'img/undraw_online.svg',
   twitterImage: 'img/undraw_tweetstorm.svg',
-  editUrl: 'https://github.com/simple-framework/simple_framework_website/edit/master/docs/'
+  editUrl: 'https://github.com/simple-framework/simple_framework_website/edit/master/docs/',
 
   // For sites with a sizable amount of content, set collapsible to true.
   // Expand/collapse the links and subcategories under categories.
@@ -151,7 +151,7 @@ const siteConfig = {
 
   // You may provide arbitrary config keys to be used as needed by your
   // template. For example, if you need your repo's URL...
-  //   repoUrl: 'https://github.com/facebook/test-site',
+  repoUrl: 'https://github.com/simple-framework/simple_grid_puppet_module',
 };
 
 module.exports = siteConfig;

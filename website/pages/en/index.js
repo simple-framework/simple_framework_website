@@ -66,7 +66,9 @@ class HomeSplash extends React.Component {
           <PromoSection>
             {/*<Button href="#try">Try It Out</Button>*/}
             {/*<Button href={docUrl('deployment_guide_htcondor.html')}> Learn More </Button>*/}
-            <Button href="https://twiki.cern.ch/twiki/bin/view/LCG/SIMPLEGridProject">Learn More</Button>
+            <Button href="https://indico.cern.ch/event/869667/contributions/3670162/">Learn More</Button>
+            <Button href="https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY">Slack</Button>
+            <Button href="/docs/deployment_guide_htcondor">Deploy HTCondor</Button>
           </PromoSection>
         </div>
       </SplashContainer>
@@ -188,6 +190,14 @@ class Index extends React.Component {
             </div>
         )
     }
+
+    const QuickLinks = () => {
+        return(
+            <div style={{display: 'flex', justifyContent: 'center', alignItems:'center'}}>
+                <Button href="">Slack</Button>
+            </div>
+        )
+    }
     const SupportedServices = () => {
         if ((siteConfig.supportedServices || []).length === 0) {
             return null;
@@ -236,7 +246,7 @@ class Index extends React.Component {
 
     return (
       <div>
-        <UnderConstruction/>
+        {/*<UnderConstruction/>*/}
         <HomeSplash siteConfig={siteConfig} language={language} />
         <div className="mainContainer">
           <Features />
