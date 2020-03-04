@@ -6,7 +6,12 @@ sidebar_label: Deployment Guide: HTCondor
 ## Quick Introduction
 
 This tutorial describes setting up a production ready [HTCondor](https://research.cs.wisc.edu/htcondor/) cluster using the SIMPLE Framework.
+The instructions below use some Puppet commands but they do not require any previous experience with Puppet. 
 
+We are currently developing a SIMPLE
+Command Line Interface that will wrap these commands conveniently. Please watch out for the 'announcements' channel in 
+[Slack](https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY)
+while we put together a Discourse forum. Please also bookmark the homepage as we plan to announce the CLI and the Discourse forum there.
 ### Target Audience
 The target audience for this tutorial are WLCG Site admins who wish to :
 1. Try out the SIMPLE framework, a private PaaS that can deploy WLCG services on demand at their site.
