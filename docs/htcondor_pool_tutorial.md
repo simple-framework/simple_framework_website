@@ -148,7 +148,7 @@ The output for which should be:
 ```shell session
 $ls -la /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/
 total 8
-drwxrw-rw- 2 root root   45 Jan 23 15:12 .
+drwxr-xr-x 2 root root   45 Jan 23 15:12 .
 drwxr-xr-x 4 root root   69 Jan 23 15:12 ..
 -rw-r--r-- 1 root root 3060 Jan 23 15:12 hostcert.pem
 -rw------- 1 root root 1828 Jan 23 15:12 hostkey.pem
@@ -830,7 +830,7 @@ virtualenv .env
 source ./.env/bin/activate
 pip install simple-grid-yaml-compiler
 simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml -o output.yaml -s schema.yaml >compiler.out 2>compiler.err
-$?
+echo "The command finished with exit code $?"
 deactivate
 pip uninstall virtualenv
 cd ~
@@ -979,7 +979,7 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
     bolt task run simple_grid::check_stage augmented_site_level_config_file=/etc/simple_grid/site_config/augmented_site_level_config_file.yaml site_infrastructure_key=site_infrastructure expected_stage=pre_deploy -t localhost
     ```
     and observe the outliers field in the output. If the outliers field is empty, that means all machines are in pre_deploy stage
-    and we can proceed to execute the stage. For instance:
+    and we can proceed to the next step to execute the stage. The correct output looks as follows:
     ```shell script
         {
             "expected_stage": "pre_deploy",
@@ -989,14 +989,30 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
         }
      ```
     Otherwise, the outliers field will enlist the FQDN and stage of the machines that are not in pre_deploy stage yet.
-    In that case, please verify that you have signed puppet certificates for all LC hosts. Try running ```puppet agent -t```
+    If the FQDN field states that localhost is in deploy stage as shown below, please rollback the CM to pre_deploy stage :
+    ```shell script
+    {
+         "expected_stage": "pre_deploy",
+         "outliers": [
+           {
+             "fqdn": "localhost",
+             "stage": "deploy"
+           }
+         ]
+       }
+    ```
+    The rollback command is:
+    ```shell script
+    puppet apply -e "class{'simple_grid::pre_deploy::config_master::rollback':}
+    ```
+    In the outliers represent any of the LC hosts, please verify that you have signed puppet certificates for all LC hosts. Then try running ```puppet agent -t```
     on the LC hosts that are outliers and [share any errors](../help) with us.
-    If the command fails, it is probably due to the facts that bolt is being configured by puppet in the background.
+    If, however, the bolt command itself fails, it is probably due to the facts that bolt is being configured by puppet in the background.
     Please wait for a while for this to finish and try again. You can also tail the /var/log/messages to see what puppet is doing.
     ```shell script
     tail -f /var/log/messages
     ```
-1. On the CM node, to execute the pre_deploy stage of the framework, run
+1.  On the CM node, to execute the pre_deploy stage of the framework, run
     ```shell script
     puppet agent -t
     ```
