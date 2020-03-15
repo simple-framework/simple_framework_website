@@ -179,7 +179,7 @@ each other over the network available at your site.
 In previous deployment instances, we have encountered situations where the deployment process would fail due to 
 misconfiguration of network for the nodes in the SIMPLE cluster.
 
-### Pre-install the CM
+## Pre-install the CM
 Install puppetserver, puppet-agent and our Puppet module on your **CM node**. Using the **simple** CLI, the command is:
 
 ```shell script
@@ -785,7 +785,7 @@ The default variables for all four LHC VOs, DTeam and Ops that you can use can b
 [this file](https://github.com/simple-framework/simple_grid_site_repo/blob/master/site_level_configuration_defaults.yaml).
 
 ## Pre-Compilation
-As mentioned earlier, it is a good practice to pre-compile your site level configuration file and spot any errors early in
+You now must pre-compile your site level configuration file, in particular to spot and fix any errors early in
 the deployment process.
 
 While are working on a web-based compiler to significantly simplify writing of the site level configuration files, you can 
