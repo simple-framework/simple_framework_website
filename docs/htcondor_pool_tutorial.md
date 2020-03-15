@@ -32,9 +32,6 @@ In this tutorial, we will :
 
 ### Additional Notes
 
-1. Terminal Captures for the appropriate steps described in this tutorial are available here: https://asciinema.org/~maany. 
-   While the tutorial is going to include links to some of them for the steps mentioned below, please feel free to 
-   check out rest of the terminal captures via the link above.
 1. We are a fast-paced development community and are constantly adding new features to the framework. Therefore, please 
    feel free to check this tutorial for updates that can be useful for your future deployments.
 1. Please do [get in touch](../help) with us in case any step is not clear or needs clarification. 
@@ -141,23 +138,17 @@ chmod 600 /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/hostkey.pem
 chmod 644 /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/hostcert.pem
 ```
 
-[![asciicast](https://asciinema.org/a/296397.svg)](https://asciinema.org/a/296397)
-
-Your host_certificates directly would finally resemble the following (continuing from our example):
-```shell script
-ls -la /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/
-```
-
-The output for which should be:
+Your host_certificates directory would finally resemble the following:
 
 ```shell session
-$ls -la /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/
+$ ls -la /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/
 total 8
 drwxr-xr-x 2 root root   45 Jan 23 15:12 .
 drwxr-xr-x 4 root root   69 Jan 23 15:12 ..
 -rw-r--r-- 1 root root 3060 Jan 23 15:12 hostcert.pem
 -rw------- 1 root root 1828 Jan 23 15:12 hostkey.pem
 ```
+
 #### CVMFS proxy
 For the HTCondor Workers to run production jobs from the grid, you must have a local CVMFS Squid proxy(an easy to configure 
 Squid forward proxy server) configured and running at your site. 
@@ -171,7 +162,7 @@ If not, then a regular Squid must be configured as described [here](http://cernv
 After you have identified a CM node and appropriate LC nodes, you must ensure that SELinux is disabled on the nodes. 
 If you prefer to have SELinux enabled, please [get in touch](../help) and we can help figure out the SELinux policy 
 required by Docker and Puppet to function correctly. Otherwise, edit /etc/selinux/config and set SELINUX=disabled. 
-Then, reboot your machine and make sure that output of the command ```sestatus`` is disabled. 
+Then, reboot your machine and make sure that output of the command ```sestatus``` is disabled. 
 
 For instance, in our example, on one of the LC nodes: 
 ```shell script
@@ -190,9 +181,10 @@ misconfiguration of network for the nodes in the SIMPLE cluster.
 
 ### Pre-install the CM
 Install puppetserver, puppet-agent and our Puppet module on your **CM node**. Using the **simple** CLI, the command is:
-    ```shell script
-    simple pre-install-cm
-    ```
+
+```shell script
+simple pre-install-cm
+```
 
 If the command does not exit with code 0, its logs would provide clues on how to resolve issues that were encountered.
 
@@ -393,7 +385,7 @@ It is essential to ensure that your site level configuration file can be success
 
 At present, to ensure you can compile your site level configuration file, you can:
 1. [Get in touch](../help) with us directly and we will help compile and fix any errors in the site level configuration file.
-1. Setup [compiler](https://github.com/simple-framework/simple_grid_yaml_compiler) as described towards the end of this section
+1. Set up [compiler](https://github.com/simple-framework/simple_grid_yaml_compiler) as described towards the end of this section
 and run it with your site level configuration file as the input.
 
 To simplify the process, we are working on a web based compiler, which should be available soon.
@@ -415,6 +407,9 @@ Modify the file according to the planned layout of your (test) cluster and make 
 
 ```shell script
 vim /etc/simple_grid/site_config/site_level_config_file.yaml
+```
+```shell script
+cp -i /etc/simple_grid/site_config/site_level_config_file.yaml ~/my-site-config-$$.yaml
 ```
 
 You will see that the configuration file has the following distinct sections:
@@ -862,8 +857,6 @@ Sign the certificate requests as follows:
 puppet cert sign --all
 ```
 
-[![asciicast](https://asciinema.org/a/296549.svg)](https://asciinema.org/a/296549)
-
 **Note**: If you do not see any certificate signing requests, please check that Port 8140 is open on your CMs firewall 
 and that the LCs can reach the CM over your network. Then try again.
 
@@ -950,7 +943,7 @@ and then proceed with the execution pipeline. The table below describes the roll
 ## Execute the Framework
 Now that we have a compilable site level configuration file and have initialized Puppet and the SIMPLE Framework on all
 of the nodes, we can execute the framework to setup our HTCondor Cluster. 
-1. On the CM node, let's ensure that all the machines are in pre_deploy stage. To do so run the command below:
+1. On the CM node, let's ensure that all the machines are in pre_deploy stage. To do so, run the command below:
     ```shell script
     simple check-stage pre-deploy
     ```
@@ -964,8 +957,8 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
             ]
         }
      ```
-    Otherwise, the outliers field will enlist the FQDN and stage of the machines that are not in pre_deploy stage yet.
-    If the FQDN field states that localhost is in deploy stage as shown below, please rollback the CM to pre_deploy stage :
+    Otherwise, the outliers field will list the FQDN and stage of the hosts that are not in the pre_deploy stage.
+    For example:
     ```shell script
     {
          "expected_stage": "pre_deploy",
@@ -977,13 +970,14 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
          ]
        }
     ```
-    The rollback command is:
+    In that case, please rollback to pre_deploy stage:
     ```shell script
     simple rollback-to pre-deploy
     ```
+    
     If the 'check-stage' command **fails** altogether, or the outliers represent any of the LC hosts, please verify that you have **signed the Puppet certificates** for all LC hosts.
     It also is possible that the underlying Bolt functionality was still being configured by Puppet in the background.
-    in that case, please wait a bit and try again. You can also tail the /var/log/messages to see what Puppet is doing.
+    In that case, please wait a bit and try again. You can also check /var/log/messages to see what Puppet is doing.
     ```shell script
     tail -f /var/log/messages
     ```
@@ -1006,7 +1000,7 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
     }
     ```
     Otherwise, the outliers field in the output 
-    would include the FQDN and stage of all the machines that are in the incorrect stage.
+    would include the FQDN and stage of all the hosts that are in the incorrect stage.
        
     If something fails, please rollback the CM to pre_deploy stage as shown above and try again.
     If it keeps failing, please get in touch for advice.
@@ -1020,30 +1014,23 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
 
 As that command might take ~15 minutes per LC host, e.g. depending on network speed, the LC hosts will be done in the background if the CM deployment succeeded. In future releases, the deployment is expected to become much faster.
 
-   **Monitoring Deployment**:
-    - The component repositories are deployed in order of the **execution_ids** that correspond to their entries in the 
-        site level configuration file. During the pre_deploy_step_1, the images for containers are fetched and then the containers 
-        are started. During pre_deploy_step_2, the grid services inside the containers get configured. Once all LC hosts have reached the final stage,
-        deployment is considered to be completed.
-    - As any time, you can check the *simple_stage* fact on all of your LC nodes as follows:
-        ```shell script
-        simple lc-stage
-        ```    
-    - If the deployment was successful, the CM and LC hosts should be in the final stage:
-         ```shell script
-         simple check-stage final
-         ```
-    - You can also check the (rather verbose) status of Docker docker images and containers as follows:
-        ```shell script
-        simple docker ls
-        ```
-        ```shell script
-        simple docker ps
-        ```
+The component repositories are deployed in order of the **execution_ids** that correspond to their entries in the
+site level configuration file. During the pre_deploy_step_1, the images for containers are fetched and then the 
+containers are started. During pre_deploy_step_2, the grid services inside the containers get configured. 
+Once all LC hosts have reached the final stage, deployment is considered to be completed.
 
+At any time, you can check the stage of all of your LC nodes as follows:
+```shell script
+simple lc-stage
+```
+
+If the deployment was successful in the end, the CM and LC hosts should be in the final stage:
+```shell script
+simple check-stage final
+```
 
 **Note**: If the deployment fails, please take a look at the deployment logs and [share the logs](../help) with us, in case they do not make sense.
-You can also try to rollback to the deploy stage, check if that worked and if so, redo the deployment step.
+You can also try to **rollback** to the deploy stage, check if that worked and, if so, redo the deployment step.
 Please get in touch if it keeps failing.
 
 If everything went well, you now have a **production ready HTCondor cluster!**
@@ -1130,9 +1117,7 @@ site:
 ```
 
 We notice that the name field in the site section has extra indentation than rest of the fields of the site section.
-Aha! Now, we just go back to our site_level_config_file and can fix the indentation and then run the SIMPLE installer again.
-
-[![asciicast](https://asciinema.org/a/296542.svg)](https://asciinema.org/a/296542)
+Aha! Now, we just go back to our site_level_config_file and can fix the indentation and continue.
 
 #### Field/Variable not declared or declared multiple times
 The second most common type of error we have come across is related to redeclaration of fields/variables or missing
@@ -1156,14 +1141,13 @@ variable. In this case, it is in the site_infrastructure section.
 Then, we would fix this error by adding the lightweight_component04_fqdn variable under the global_variables section of 
 the site_level_configuration_file.
 
-[![asciicast](https://asciinema.org/a/296543.svg)](https://asciinema.org/a/296543)
 
 ## Known Issues
 
 ### Some containers do not start 
 
-We have noticed that sometimes a few of the containers end up in the 'Created' state.
-This behaviour has been observed since we moved to Docker > 19 and we are working on fixing it in our upcoming releases.
+We have noticed that sometimes a few of the containers ended up in the 'Created' state.
+This behaviour has been observed since we moved to Docker > 19, but we managed to deal with it in the meantime, as far as we can tell.
 You can track our progress here: [issue_119](https://github.com/simple-framework/simple_grid_puppet_module/issues/119),
 [issue_144](https://github.com/simple-framework/simple_grid_puppet_module/issues/144).
 For a manual fix, please [get in touch](../help) with us.
