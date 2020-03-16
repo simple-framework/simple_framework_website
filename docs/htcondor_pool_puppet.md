@@ -8,11 +8,10 @@ sidebar_label: Deployment Guide: HTCondor
 This tutorial describes setting up a production ready [HTCondor](https://research.cs.wisc.edu/htcondor/) cluster using the SIMPLE Framework.
 The instructions below use some Puppet commands but they do not require any previous experience with Puppet. 
 
-We are rapidly taking feedback from the site admins and rolling out updated versions of the framework's components. To stay in loop, 
-please watch out for the 'announcements' channel in 
+We are currently developing a SIMPLE
+Command Line Interface that will wrap these commands conveniently. Please watch out for the 'announcements' channel in 
 [Slack](https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY)
-while we put together a Discourse forum. Please also bookmark the homepage as we plan to announce the Discourse forum there.
-
+while we put together a Discourse forum. Please also bookmark the homepage as we plan to announce the CLI and the Discourse forum there.
 ### Target Audience
 The target audience for this tutorial are WLCG Site admins who wish to :
 1. Try out the SIMPLE framework, a private PaaS that can deploy WLCG services on demand at their site.
@@ -33,6 +32,9 @@ In this tutorial, we will :
 
 ### Additional Notes
 
+1. Terminal Captures for the appropriate steps described in this tutorial are available here: https://asciinema.org/~maany. 
+   While the tutorial is going to include links to some of them for the steps mentioned below, please feel free to 
+   check out rest of the terminal captures via the link above.
 1. We are a fast-paced development community and are constantly adding new features to the framework. Therefore, please 
    feel free to check this tutorial for updates that can be useful for your future deployments.
 1. Please do [get in touch](../help) with us in case any step is not clear or needs clarification. 
@@ -139,17 +141,23 @@ chmod 600 /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/hostkey.pem
 chmod 644 /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/hostcert.pem
 ```
 
-Your host_certificates directory would finally resemble the following:
+[![asciicast](https://asciinema.org/a/296397.svg)](https://asciinema.org/a/296397)
+
+Your host_certificates directly would finally resemble the following (continuing from our example):
+```shell script
+ls -la /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/
+```
+
+The output for which should be:
 
 ```shell session
-$ ls -la /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/
+$ls -la /etc/simple_grid/host_certificates/simple-lc-node0.cern.ch/
 total 8
 drwxr-xr-x 2 root root   45 Jan 23 15:12 .
 drwxr-xr-x 4 root root   69 Jan 23 15:12 ..
 -rw-r--r-- 1 root root 3060 Jan 23 15:12 hostcert.pem
 -rw------- 1 root root 1828 Jan 23 15:12 hostkey.pem
 ```
-
 #### CVMFS proxy
 For the HTCondor Workers to run production jobs from the grid, you must have a local CVMFS Squid proxy(an easy to configure 
 Squid forward proxy server) configured and running at your site. 
@@ -163,7 +171,7 @@ If not, then a regular Squid must be configured as described [here](http://cernv
 After you have identified a CM node and appropriate LC nodes, you must ensure that SELinux is disabled on the nodes. 
 If you prefer to have SELinux enabled, please [get in touch](../help) and we can help figure out the SELinux policy 
 required by Docker and Puppet to function correctly. Otherwise, edit /etc/selinux/config and set SELINUX=disabled. 
-Then, reboot your machine and make sure that output of the command ```sestatus``` is disabled. 
+Then, reboot your machine and make sure that output of the command ```sestatus`` is disabled. 
 
 For instance, in our example, on one of the LC nodes: 
 ```shell script
@@ -180,31 +188,38 @@ each other over the network available at your site.
 In previous deployment instances, we have encountered situations where the deployment process would fail due to 
 misconfiguration of network for the nodes in the SIMPLE cluster.
 
-## Simple CLI
-The Simple CLI enables you to interact with the framework and with your SIMPLE cluster in a very user-friendly way. It executes
-the different stages during your deployment, performs validation checks on your infrastructure, informs you if anything 
-goes wrong and organizes stdout, stderr from the commands issued by it.
+### Installation of Puppet
+1. Install puppetserver, puppet-agent (Puppet 5) on your **CM node**. For CentOS7 distributions, the commands would be:
+    ```shell script
+    rpm -ivh https://yum.puppetlabs.com/puppet5/puppet5-release-el-7.noarch.rpm
+    yum -y install puppetserver puppet-agent
+    ```
 
-You can install the Simple CLI on your CM via:
+1. Install puppet-agent (Puppet 5) on all of your **LC nodes**. For CC7, the commands are:
+    ```
+    rpm -ivh https://yum.puppetlabs.com/puppet5/puppet5-release-el-7.noarch.rpm
+    yum -y install puppet-agent
+    ```
+
+1. Verify that puppet is installed. For instance,
+    ```shell script
+     puppet --version
+    ```
+   The output should be something similar to:
+   ```shell script
+     5.5.17
+    ```
+[![asciicast](https://asciinema.org/a/296405.svg)](https://asciinema.org/a/296405)
+## Installation of Central Configuration Manager 
+The Central Configuration Manager or CCM in SIMPLE Framework's terminology is a framework component that manages 
+the configuration and deployment of your SIMPLE Cluster. In case of puppet the CCM is the [simple_grid_puppet_module](https://forge.puppet.com/maany/simple_grid).
+On the CM and all of the LC nodes, you will now install the latest [simple_grid_puppet_module](https://forge.puppet.com/maany/simple_grid) from Puppet Forge
+using the command below:
+
 ```shell script
-curl https://raw.githubusercontent.com/simple-framework/simple_bash_cli/master/simple --output ~/simple
-chmod +x ~/simple
-alias simple=~/simple
-cd ~
+puppet module install maany-simple_grid
 ```
-
-**Note**: The CLI generates its logs at */var/log/simple*
-
-**Note**: In the remainder of the tutorial we will use the Simple CLI functions to deploy the HTCondor Cluster.
- 
-## Pre-install the CM
-Install puppetserver, puppet-agent and our Puppet module on your **CM node**. Using the **simple** CLI, the command is:
-
-```shell script
-simple pre-install-cm
-```
-
-If the command does not exit with code 0, its logs would provide clues on how to resolve issues that were encountered.
+[![asciicast](https://asciinema.org/a/296406.svg)](https://asciinema.org/a/296406)
 
 ## Preparing a site level configuration file.
 
@@ -403,32 +418,31 @@ It is essential to ensure that your site level configuration file can be success
 
 At present, to ensure you can compile your site level configuration file, you can:
 1. [Get in touch](../help) with us directly and we will help compile and fix any errors in the site level configuration file.
-1. Set up [compiler](https://github.com/simple-framework/simple_grid_yaml_compiler) as described towards the end of this section
+1. Setup [compiler](https://github.com/simple-framework/simple_grid_yaml_compiler) as described towards the end of this section
 and run it with your site level configuration file as the input.
 
-To simplify the process, we are working on a web based compiler, which should be available soon.
+To simplify the process, we are working on a web based compiler, which will be available soon.
 
 Below, we mention the instructions that should be sufficient to write a sensible site level configuration file.
 
 First off, the framework can significantly assist you in writing your site level config file by generating 
-a **template** for your HTCondor installation.
+a template for your HTCondor installation.
 
 To do so, on the CM node, you can use the command below to generate a sample site level configuration file that you can modify 
-for your installation. The sample HTCondor site_level_config_file.yaml will be put directly at its default location
-**/etc/simple_grid/site_config/site_level_config_file.yaml** and **overwrite** whatever was there before:
+for your installation. The sample HTCondor site_level_config_file.yaml is available at 
+**/etc/simple_grid/site_config/site_level_config_file.yaml**
 
 ```shell script
-simple create-template
+puppet apply -e 'class{"simple_grid::install::config_master::simple_installer::create_sample_site_level_config_file":}'
 ```
+[![asciicast](https://asciinema.org/a/296526.svg)](https://asciinema.org/a/296526)
 
-Modify the file according to the planned layout of your (test) cluster as described below: 
-and make a **backup** of the result in a safe place: 
-
+In case you decide to not use the puppet command above, please create the following dir: 
+```shell script
+mkdir -p /etc/simple_grid/site_config
+```
 ```shell script
 vim /etc/simple_grid/site_config/site_level_config_file.yaml
-```
-```shell script
-cp -i /etc/simple_grid/site_config/site_level_config_file.yaml ~/my-site-config-$$.yaml
 ```
 
 You will see that the configuration file has the following distinct sections:
@@ -804,77 +818,69 @@ The default variables for all four LHC VOs, DTeam and Ops that you can use can b
 [this file](https://github.com/simple-framework/simple_grid_site_repo/blob/master/site_level_configuration_defaults.yaml).
 
 ## Pre-Compilation
-You now must pre-compile your site level configuration file, in particular to spot and fix any errors early in
+As mentioned earlier, it is a good practice to pre-compile your site level configuration file and spot any errors early in
 the deployment process.
 
 While are working on a web-based compiler to significantly simplify writing of the site level configuration files, you can 
 use the commands shown below to locally test the compilation of your site level configuration file in the meantime.
 
 ```shell script
-simple pre-compile
+cd ~
+mkdir -p simple_grid_yaml_compiler/.temp
+cd simple_grid_yaml_compiler
+yum install -y python-pip
+pip install --upgrade pip
+pip install virtualenv
+virtualenv .env
+source ./.env/bin/activate
+pip install simple-grid-yaml-compiler
+simple_grid_yaml_compiler /etc/simple_grid/site_config/site_level_config_file.yaml -o output.yaml -s schema.yaml >compiler.out 2>compiler.err
+echo "The command finished with exit code $?"
+deactivate
+pip uninstall virtualenv
+cd ~
 ```
 If the compiler runs without any errors (i.e. the exit code is 0), you can proceed with the deployment. If there are errors, please take a look
 at the troubleshooting guide towards the end of this tutorial or [get in touch](../help) with us for further assistance.
 
-## Extract the LC hosts
-Next you will run the following command to extract the list of LC hosts from your site level configuration file, to make them conveniently available as input to subsequent commands:
+## Simple Installer for CM
+After writing the site level configuration file and, preferably, pre-checking it for any compilation errors through the 
+mechanisms mentioned in the previous section, we need to initialize the SIMPLE framework by running the simple installer 
+on the CM node.  
 
 ```shell script
-simple extract-lc
+puppet apply --modulepath /etc/puppetlabs/code/environments/production/modules -e 'class{"simple_grid::install::config_master::simple_installer":}'
 ```
+[![asciicast](https://asciinema.org/a/296529.svg)](https://asciinema.org/a/296529)
 
-## Generate ssh key for your cluster
-To allow the LC hosts to be remotely installed and configured from the CM, a custom ssh key will be used by the framework. Generate it as follows:
-
-```shell script
-simple generate-key
-```
-
-Install the corresponding **public** ssh key on all your LC hosts, typically by **appending** it to the /root/.ssh/authorized_keys file.
-
-## Check if ssh works for your cluster
-The framework needs to be able to ssh from the CM to each of your LC hosts. Set it up as follows:
-
-```shell script
-simple test-ssh
-```
-
-For each LC host you typically will need to confirm its addition to the list of known hosts. Then **rerun** the command to check that it proceeds fine without further dialogues:
-
-```shell script
-simple test-ssh
-```
-
-## Pre-install the LC hosts
-Now that ssh works from the CM to your LC hosts, the framework will be able to pre-install the latter:
-
-```shell script
-simple pre-install-lc
-```
-
-## Install the CM and the LC hosts
-We now can initialize the SIMPLE framework by running its installer on the CM as well as the LC hosts:
-
-```shell script
-simple install
-```
-
-If you see any errors, please take a look at the troubleshooting section towards the end of 
+If you see any errors related to the YAML compiler, please take a look at the troubleshooting section towards the end of 
 this tutorial. As always, please feel free to [get in touch with us](../help) to help debug the error, if needed. 
 
-## Puppet certificate signing requests from LC hosts
+## Simple Installer for LC's
 
-On your CM node, you will now see the certificate signing requests from LC hosts using:
+On your LC nodes, run the following command to initialize the SIMPLE Framework.
+Remember to change the 'fqdn of your CM node' with the correct fqdn of your CM node.
+
+```shell script
+puppet apply --modulepath /etc/puppetlabs/code/environments/production/modules -e "class {'simple_grid::install::lightweight_component::simple_installer':puppet_master => 'fqdn of your CM node'}"
+```
+[![asciicast](https://asciinema.org/a/296547.svg)](https://asciinema.org/a/296547)
+
+## Puppet certificate singing requests from LC's to CM
+
+On your CM node, you will now see the certificate signing requests from LC's using:
  
 ```shell script
 puppet cert list -all
 ```
 
-Sign the certificate requests as follows:
+Sign the certificate requests from the LC nodes:
 
 ```shell script
 puppet cert sign --all
 ```
+
+[![asciicast](https://asciinema.org/a/296549.svg)](https://asciinema.org/a/296549)
 
 **Note**: If you do not see any certificate signing requests, please check that Port 8140 is open on your CMs firewall 
 and that the LCs can reach the CM over your network. Then try again.
@@ -909,64 +915,75 @@ To check the stage of any of your CM or LC nodes, you can run the following comm
 ```shell script
 puppet facts | grep simple_stage
 ```
-On the CM, there is a convenient shorthand for that:
-```
-simple cm-stage
-```
-
 ### Puppet Bolt
 After the config stage, you can use Puppet Bolt on your CM to directly execute shell commands and scripts on some or 
-all of your LCs. For the most important such commands, the **simple** CLI provides convenient wrappers.
-Let's say we wish to check the stage for our LC hosts:
+all of your LCs.
+Let's say we wish to check the stage for our nodes, then the bolt command would look as follows:
 ```shell script
-simple lc-stage
+bolt command run 'puppet facts| grep simple_stage' -t simple-lc-node0.cern.ch,simple-lc-node1.cern.ch,simple-lc-node2.cern.ch,simple-lc-node3.cern.ch
 ```
-That command is rather verbose, showing various underlying Bolt details. A more pleasant way to check the stages of the CM and all LC hosts in one go is as follows:
+This command can be further simplified by creating a text file called, let's say, lc and then adding, one per line, the FQDN of the node
+on which we wish to execute a shell command.
+For our example cluster, we create the lc file as follows:
 ```shell script
-simple check-stage stage-name
+vim /etc/simple_grid/lc
 ```
-where 'stage-name' is the name of the expected stage, as detailed below. The command will print the outliers, i.e. those hosts that are **not** in the expected stage, along with their actual stages.
+and add the following content to it:
+```text
+simple-lc-node0.cern.ch
+simple-lc-node1.cern.ch
+simple-lc-node2.cern.ch
+simple-lc-node3.cern.ch
+```
+
+Now, the above bolt command can be reduced to:
+
+```shell script
+bolt command run 'puppet facts| grep simple_stage' -t @/etc/simple_grid/lc
+```
+
+[![asciicast](https://asciinema.org/a/296551.svg)](https://asciinema.org/a/296551)
 
 ### Execution Pipeline Traversal
 
 #### Forward direction
 The recipes here describe how to go from one stage to another in the execution pipeline.
 
-| Current Stage | Next Stage                | Node Type | Command                 |
-|---------------|---------------------------|-----------|-------------------------|
-| install/config| pre_deploy                | CM        | ```simple install```    |
-| pre_deploy    | deploy                    | CM        | ```simple pre-deploy``` |
-| deploy        | final                     | CM        | ```simple deploy```     |
-| install       | config/pre_deploy_step_1  | LC*       | ```simple install```    |
+| Current Stage | Next Stage                | Node Type | Command                                                                                         |
+|---------------|---------------------------|-----------|-------------------------------------------------------------------------------------------------|
+| install       | pre_deploy                | CM        | ```puppet apply -e "class{'simple_grid::install::config_master::simple_installer':}"```         |
+| pre_deploy    | deploy                    | CM        | ```puppet agent -t```                                                                           |
+| deploy        | final                     | CM        | ```puppet agent -t```                                                                           |
+| install       | config/pre_deploy_step_1  | LC*       | ```puppet apply -e "class{'simple_grid::install::lightweight_component::simple_installer':}"``` |
 
 **Note***: The command sets the stage to *config* and puppet agent runs in the background to fetch some additional configuration from the CM. Once that is complete,
-the stage is set to *pre_deploy_step_1*.
+the stage is set to *pre_deploy_step_1*. This command is executed only once per deployment. Since we have executed it in previous steps, we could not have to execute it again.
 
 #### Reverse direction
 Life's not perfect and despite our best efforts we may run into unexpected issues during the framework's execution.
 In the past we have seen network errors or configuration errors which required us to rollback to previous_stages, fix the issues
 and then proceed with the execution pipeline. The table below describes the rollback commands:
 
-| Current Stage | Next Stage | Node Type | Command                             |
-|---------------|------------|-----------|-------------------------------------|
-| final         | deploy     | CM        | ```simple rollback-to deploy```     |
-| final         | deploy     | CM*       | ```simple rollback-to deploy rmi``` |
-| deploy        | pre_deploy | CM        | ```simple rollback-to pre-deploy``` |
-| pre_deploy    | config     | CM        | ```simple rollback-to config```     |
-| pre_deploy    | config     | LC**      | ```simple rollback-to config lc```  |
+| Current Stage | Next Stage | Node Type | Command                                                                                                                                  |
+|---------------|------------|-----------|------------------------------------------------------------------------------------------------------------------------------------------|
+| final         | deploy     | CM        | ```puppet apply -e "class{'simple_grid::deploy::config_master::rollback':}"```                                                           |
+| final         | deploy     | CM*       | ```puppet apply -e "class{'simple_grid::deploy::config_master::rollback': remove_images => true}"```                                     |
+| deploy        | pre_deploy | CM        | ```puppet apply -e "class{'simple_grid::pre_deploy::config_master::rollback':}"```                                                       |
+| pre_deploy    | config     | CM        | ```puppet apply -e "class{'simple_grid::config::config_master::rollback':}"```                                                           |
+| pre_deploy    | config     | LC**      | ```bolt command run "puppet apply -e \"class{'simple_grid::config::lightweight_component::rollback':}\"" -t @/etc/simple_grid/lc``` |
 
 **Note** *: Removes HTCondor Docker images from all nodes.
 
-**Note** **: You should almost never have to rollback the LCs to config stage.
+**Note** **: You might almost never have to rollback the LC's to config stage.
 
 ## Execute the Framework
 Now that we have a compilable site level configuration file and have initialized Puppet and the SIMPLE Framework on all
 of the nodes, we can execute the framework to setup our HTCondor Cluster. 
-1. On the CM node, let's ensure that all the machines are in pre_deploy stage. To do so, run the command below:
+1. On the CM node, let's ensure that all the machines are in pre_deploy stage. To do so run the command below:
     ```shell script
-    simple check-stage pre-deploy
+    bolt task run simple_grid::check_stage augmented_site_level_config_file=/etc/simple_grid/site_config/augmented_site_level_config_file.yaml site_infrastructure_key=site_infrastructure expected_stage=pre_deploy -t localhost
     ```
-    and observe the outliers field in the output. If the command **fails** altogether, see below for advice. If the outliers field is empty, that means all machines are in pre_deploy stage
+    and observe the outliers field in the output. If the outliers field is empty, that means all machines are in pre_deploy stage
     and we can proceed to the next step to execute the stage. The correct output looks as follows:
     ```shell script
         {
@@ -976,8 +993,8 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
             ]
         }
      ```
-    Otherwise, the outliers field will list the FQDN and stage of the hosts that are not in the pre_deploy stage.
-    For example:
+    Otherwise, the outliers field will enlist the FQDN and stage of the machines that are not in pre_deploy stage yet.
+    If the FQDN field states that localhost is in deploy stage as shown below, please rollback the CM to pre_deploy stage :
     ```shell script
     {
          "expected_stage": "pre_deploy",
@@ -989,25 +1006,28 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
          ]
        }
     ```
-    In that case, please rollback to pre_deploy stage:
+    The rollback command is:
     ```shell script
-    simple rollback-to pre-deploy
+    puppet apply -e "class{'simple_grid::pre_deploy::config_master::rollback':}
     ```
-    
-    If the 'check-stage' command **fails** altogether, or the outliers represent any of the LC hosts, please verify that you have **signed the Puppet certificates** for all LC hosts.
-    It also is possible that the underlying Bolt functionality was still being configured by Puppet in the background.
-    In that case, please wait a bit and try again. You can also check /var/log/messages to see what Puppet is doing.
+    If the outliers represent any of the LC hosts, please verify that you have signed puppet certificates for all LC hosts. Then try running ```puppet agent -t```
+    on the LC hosts that are outliers and [share any errors](../help) with us.
+    If, however, the bolt command itself fails, it is probably due to the facts that bolt is being configured by puppet in the background.
+    Please wait for a while for this to finish and try again. You can also tail the /var/log/messages to see what puppet is doing.
     ```shell script
     tail -f /var/log/messages
     ```
-1.  On the CM node, to execute the pre_deploy stage of the framework, run:
+1.  On the CM node, to execute the pre_deploy stage of the framework, run
     ```shell script
-    simple pre-deploy
+    puppet agent -t
     ```
-       
-    Then check if all the nodes are now in the deploy stage:
+    
+    [![asciicast](https://asciinema.org/a/296553.svg)](https://asciinema.org/a/296553)
+   
+    You can run the following bolt task to check if all the nodes are now in the deploy stage:
     ```shell script
-    simple check-stage deploy
+    bolt task run simple_grid::check_stage augmented_site_level_config_file=/etc/simple_grid/site_config/augmented_site_level_config_file.yaml \
+    site_infrastructure_key=site_infrastructure expected_stage=deploy -t localhost
     ```
     If the pre_deploy stage ran successfully, you will see an empty list of outliers in the output. 
     ```shell script
@@ -1019,40 +1039,55 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
     }
     ```
     Otherwise, the outliers field in the output 
-    would include the FQDN and stage of all the hosts that are in the incorrect stage.
+    would include the fqdn and stage of all the machines that are in the incorrect stage.
        
-    If something fails, please rollback the CM to pre_deploy stage as shown above and try again.
-    If it keeps failing, please get in touch for advice.
-    
+    If something fails, please rollback the CM to pre_deploy stage based on the commands shown in the section above.
+    Here it is again:
+    ```shell script
+    puppet apply -e "class{'simple_grid::pre_deploy::config_master::rollback':}"
+    ```
 
 1. On the CM, execute the deploy stage:
 
     ```shell script
-    simple deploy
+    puppet agent -t
     ```
-
-As that command might take ~15 minutes per LC host, e.g. depending on network speed, the LC hosts will be done in the background if the CM deployment succeeded. In future releases, the deployment is expected to become much faster.
-
-The component repositories are deployed in order of the **execution_ids** that correspond to their entries in the
-site level configuration file. During the pre_deploy_step_1, the images for containers are fetched and then the 
-containers are started. During pre_deploy_step_2, the grid services inside the containers get configured. 
-Once all LC hosts have reached the final stage, deployment is considered to be completed.
-
-At any time, you can check the stage of all of your LC nodes as follows:
+   [![asciicast](https://asciinema.org/a/296612.svg)](https://asciinema.org/a/296612)
+   
+   **Monitoring Deployment**:
+    - Depending on factors like network speed, size of your cluster etc. it might take a while for the deployment to finish.
+        We estimate between 5-20 minutes per container. In the future releases, the deployment time to be significantly cut down.
+    
+    - The component repositories are deployed in order of the **execution_ids** that correspond to their entries in the 
+        site level configuration file. During the pre_deploy_step_1, the images for containers are fetched and then the containers 
+        are started. During pre_deploy_step_2, the grid services inside the containers get configured. Once all LC hosts have reached the final stage,
+        deployment is considered to be completed.
+    
+    - You can check the *simple_stage* fact on all of your LC nodes by using Puppet Bolt as described in the Puppet Bolt section above.
+        ```shell script
+        bolt command run 'puppet facts | grep simple_stage' -t @/etc/simple_grid/lc
+        ```    
+    - You can also check the status docker docker images and docker containers on your LC nodes by running the following bolt commands on your CM.
+        ```shell script
+        bolt command run 'docker image ls' -t @/etc/simple_grid/lc
+        ```
+        ```shell script
+        bolt command run 'docker ps -a' -t @/etc/simple_grid/lc
+        ```
+        [![asciicast](https://asciinema.org/a/296613.svg)](https://asciinema.org/a/296613)
+To verify that things look good at the end of the deployment, you can execute the  following command and ensure that the outliers field in the output 
+is empty. 
 ```shell script
-simple lc-stage
+bolt task run simple_grid::check_stage augmented_site_level_config_file=/etc/simple_grid/site_config/augmented_site_level_config_file.yaml site_infrastructure_key=site_infrastructure expected_stage=final -t localhost
+```
+**Note**: If the deployment fails, please take a look at the deployment message and [share the logs](../help) with us, in case they do not make sense.
+You could also try to rollback the deploy stage as and then execute it again with ```puppet agent -t``` command. To rollback deploy stage, 
+execute the following command on the CM:
+```shell script
+puppet apply -e "class{'simple_grid::deploy::config_master::rollback':}"
 ```
 
-If the deployment was successful in the end, the CM and LC hosts should be in the final stage:
-```shell script
-simple check-stage final
-```
-
-**Note**: If the deployment fails, please take a look at the deployment logs and [share the logs](../help) with us, in case they do not make sense.
-You can also try to **rollback** to the deploy stage, check if that worked and, if so, redo the deployment step.
-Please get in touch if it keeps failing.
-
-If everything went well, you now have a **production ready HTCondor cluster!**
+If everything went well, you now have a production ready HTCondor cluster. 
 
 ## Inspecting the SIMPLE cluster
 
@@ -1136,7 +1171,9 @@ site:
 ```
 
 We notice that the name field in the site section has extra indentation than rest of the fields of the site section.
-Aha! Now, we just go back to our site_level_config_file and can fix the indentation and continue.
+Aha! Now, we just go back to our site_level_config_file and can fix the indentation and then run the SIMPLE installer again.
+
+[![asciicast](https://asciinema.org/a/296542.svg)](https://asciinema.org/a/296542)
 
 #### Field/Variable not declared or declared multiple times
 The second most common type of error we have come across is related to redeclaration of fields/variables or missing
@@ -1160,10 +1197,17 @@ variable. In this case, it is in the site_infrastructure section.
 Then, we would fix this error by adding the lightweight_component04_fqdn variable under the global_variables section of 
 the site_level_configuration_file.
 
+[![asciicast](https://asciinema.org/a/296543.svg)](https://asciinema.org/a/296543)
 
 ## Known Issues
 
-Please report anything unexpected you've encountered by [reaching out to us](../help). We will update this section as we become aware of such cases.
+### Some containers do not start 
+
+We have noticed that sometimes a few of the containers end up in the 'Created' state.
+This behaviour has been observed since we moved to Docker > 19 and we are working on fixing it in our upcoming releases.
+You can track our progress here: [issue_119](https://github.com/simple-framework/simple_grid_puppet_module/issues/119),
+[issue_144](https://github.com/simple-framework/simple_grid_puppet_module/issues/144).
+For a manual fix, please [get in touch](../help) with us.
 
 ## FAQs 
 
