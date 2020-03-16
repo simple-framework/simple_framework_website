@@ -187,12 +187,18 @@ goes wrong and organizes stdout, stderr from the commands issued by it.
 
 You can install the Simple CLI on your CM via:
 ```shell script
-curl https://raw.githubusercontent.com/simple-framework/simple_bash_cli/master/simple --output ~/simple
+curl https://raw.githubusercontent.com/simple-framework/simple_bash_cli/current/simple --output ~/simple
 chmod +x ~/simple
 alias simple=~/simple
 cd ~
 ```
 
+As an optional step, you can create an alias for the script in your ~/.bashrc file in case you'd like to access the script 
+more conveniently in the future.
+
+```shell script
+echo "alias simple=~/simple" >> ~/.bashrc
+```
 **Note**: The CLI generates its logs at */var/log/simple*
 
 **Note**: In the remainder of the tutorial we will use the Simple CLI functions to deploy the HTCondor Cluster.
@@ -927,6 +933,12 @@ simple check-stage stage-name
 ```
 where 'stage-name' is the name of the expected stage, as detailed below. The command will print the outliers, i.e. those hosts that are **not** in the expected stage, along with their actual stages.
 
+*Optional* : if you'd like to execute a command on all nodes in your cluster, you can do using bolt from now on. For instance,
+the command below would return the hostname of all the LCs in your cluster:
+
+```shell script
+bolt command run 'hostname' -t @/etc/simple_grid/lc
+```
 ### Execution Pipeline Traversal
 
 #### Forward direction
