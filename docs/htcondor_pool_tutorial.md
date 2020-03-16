@@ -868,6 +868,8 @@ simple install
 If you see any errors, please take a look at the troubleshooting section towards the end of 
 this tutorial. As always, please feel free to [get in touch with us](../help) to help debug the error, if needed. 
 
+**Note**: If you would like to ignore failures reported by the validation engine, please check the 
+[FAQ](faq) section at the end of this guide
 ## Puppet certificate signing requests from LC hosts
 
 On your CM node, you will now see the certificate signing requests from LC hosts using:
@@ -1179,6 +1181,21 @@ Please report anything unexpected you've encountered by [reaching out to us](../
 
 ## FAQs 
 
+### How can I disable the CLI from exiting in case of validation errors?
+By default, if there are errors reported by the validation engine, it will cause the framework's pipeline stage to not run.
+You could still proceed with the installation, bearing in mind that things could go wrong in the configuration
+depending on the nature of the validation errors.
+To disable hard errors from the validation engine, you can open the simple cli script.
+```shell script
+vim ~/simple
+``` 
+And then uncomment the lines that after "Uncomment the lines below..":
+```shell script
+    # Uncomment the lines below to ignore validation engine errors
+    # echo "For now just exit 0..."
+    # exit 0
+
+```
 ### Can I add new machines, for instance WNs, after deploying a SIMPLE cluster?
 Yes, it is possible to add new LC hosts to your existing SIMPLE cluster. The instructions are about 10-15 steps per node
 at present and we are working to release them as a single command in our upcoming releases. Please [contact us](../help)
