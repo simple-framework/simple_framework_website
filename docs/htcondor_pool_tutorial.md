@@ -8,10 +8,11 @@ sidebar_label: Deployment Guide: HTCondor
 This tutorial describes setting up a production ready [HTCondor](https://research.cs.wisc.edu/htcondor/) cluster using the SIMPLE Framework.
 The instructions below use some Puppet commands but they do not require any previous experience with Puppet. 
 
-We are currently developing a SIMPLE
-Command Line Interface that will wrap these commands conveniently. Please watch out for the 'announcements' channel in 
+We are rapidly taking feedback from the site admins and rolling out updated versions of the framework's components. To stay in loop, 
+please watch out for the 'announcements' channel in 
 [Slack](https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY)
-while we put together a Discourse forum. Please also bookmark the homepage as we plan to announce the CLI and the Discourse forum there.
+while we put together a Discourse forum. Please also bookmark the homepage as we plan to announce the Discourse forum there.
+
 ### Target Audience
 The target audience for this tutorial are WLCG Site admins who wish to :
 1. Try out the SIMPLE framework, a private PaaS that can deploy WLCG services on demand at their site.
@@ -179,6 +180,23 @@ each other over the network available at your site.
 In previous deployment instances, we have encountered situations where the deployment process would fail due to 
 misconfiguration of network for the nodes in the SIMPLE cluster.
 
+## Simple CLI
+The Simple CLI enables you to interact with the framework and with your SIMPLE cluster in a very user-friendly way. It executes
+the different stages during your deployment, performs validation checks on your infrastructure, informs you if anything 
+goes wrong and organizes stdout, stderr from the commands issued by it.
+
+You can install the Simple CLI on your CM via:
+```shell script
+curl https://raw.githubusercontent.com/simple-framework/simple_bash_cli/master/simple --output ~/simple
+chmod +x ~/simple
+alias simple=~/simple
+cd ~
+```
+
+**Note**: The CLI generates its logs at */var/log/simple*
+
+**Note**: In the remainder of the tutorial we will use the Simple CLI functions to deploy the HTCondor Cluster.
+ 
 ## Pre-install the CM
 Install puppetserver, puppet-agent and our Puppet module on your **CM node**. Using the **simple** CLI, the command is:
 
@@ -403,7 +421,8 @@ for your installation. The sample HTCondor site_level_config_file.yaml will be p
 simple create-template
 ```
 
-Modify the file according to the planned layout of your (test) cluster and make a **backup** of the result in a safe place: 
+Modify the file according to the planned layout of your (test) cluster as described below: 
+and make a **backup** of the result in a safe place: 
 
 ```shell script
 vim /etc/simple_grid/site_config/site_level_config_file.yaml
@@ -1144,13 +1163,7 @@ the site_level_configuration_file.
 
 ## Known Issues
 
-### Some containers do not start 
-
-We have noticed that sometimes a few of the containers ended up in the 'Created' state.
-This behaviour has been observed since we moved to Docker > 19, but we managed to deal with it in the meantime, as far as we can tell.
-You can track our progress here: [issue_119](https://github.com/simple-framework/simple_grid_puppet_module/issues/119),
-[issue_144](https://github.com/simple-framework/simple_grid_puppet_module/issues/144).
-For a manual fix, please [get in touch](../help) with us.
+Please report anything unexpected you've encountered by [reaching out to us](../help). We will update this section as we become aware of such cases.
 
 ## FAQs 
 
