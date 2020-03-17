@@ -929,11 +929,11 @@ Let's say we wish to check the stage for our LC hosts:
 ```shell script
 simple lc-stage
 ```
-That command is rather verbose, showing various underlying Bolt details. A more pleasant way to check the stages of the CM and all LC hosts in one go is as follows:
+That command is rather verbose, showing various underlying Bolt details. **NOTE:** if it **fails**, see below. A more pleasant way to check the stages of the CM and all LC hosts in one go is as follows:
 ```shell script
-simple check-stage stage-name
+simple check-stage [ stage-name ]
 ```
-where 'stage-name' is the name of the expected stage, as detailed below. The command will print the outliers, i.e. those hosts that are **not** in the expected stage, along with their actual stages.
+where the optional 'stage-name' is the name of the expected stage, as detailed below. The command will print the outliers, i.e. those hosts that are **not** in the expected stage, along with their actual stages.
 
 *Optional* : if you'd like to execute a command on all nodes in your cluster, you can do using bolt from now on. For instance,
 the command below would return the hostname of all the LCs in your cluster:
@@ -941,6 +941,9 @@ the command below would return the hostname of all the LCs in your cluster:
 ```shell script
 bolt command run 'hostname' -t @/etc/simple_grid/lc
 ```
+
+**NOTE:** the command **has** to work, otherwise the remaining steps of the deployment will fail. If the command initially **fails**, usually it is due to Puppet still configuring Bolt in the background. In that case, wait a minute or two and try again. If it keeps failing, please get in touch.
+
 ### Execution Pipeline Traversal
 
 #### Forward direction
@@ -1007,7 +1010,6 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
     ```shell script
     simple rollback-to pre-deploy
     ```
-    
     If the 'check-stage' command **fails** altogether, or the outliers represent any of the LC hosts, please verify that you have **signed the Puppet certificates** for all LC hosts.
     It also is possible that the underlying Bolt functionality was still being configured by Puppet in the background.
     In that case, please wait a bit and try again. You can also check /var/log/messages to see what Puppet is doing.
@@ -1018,7 +1020,6 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
     ```shell script
     simple pre-deploy
     ```
-       
     Then check if all the nodes are now in the deploy stage:
     ```shell script
     simple check-stage deploy
@@ -1037,10 +1038,7 @@ of the nodes, we can execute the framework to setup our HTCondor Cluster.
        
     If something fails, please rollback the CM to pre_deploy stage as shown above and try again.
     If it keeps failing, please get in touch for advice.
-    
-
 1. On the CM, execute the deploy stage:
-
     ```shell script
     simple deploy
     ```
@@ -1052,9 +1050,9 @@ site level configuration file. During the pre_deploy_step_1, the images for cont
 containers are started. During pre_deploy_step_2, the grid services inside the containers get configured. 
 Once all LC hosts have reached the final stage, deployment is considered to be completed.
 
-At any time, you can check the stage of all of your LC nodes as follows:
+At any time, you can check the stage of your CM and LC nodes as follows:
 ```shell script
-simple lc-stage
+simple check-stage
 ```
 
 If the deployment was successful in the end, the CM and LC hosts should be in the final stage:
@@ -1085,6 +1083,8 @@ Once you are in the container:
 1. You can check if condor and condor-ce services are up.
     ```shell script
     systemctl status condor-ce
+    ```
+    ```shell script
     systemctl status condor
     ```
 
@@ -1182,20 +1182,22 @@ Please report anything unexpected you've encountered by [reaching out to us](../
 ## FAQs 
 
 ### How can I disable the CLI from exiting in case of validation errors?
-By default, if there are errors reported by the validation engine, it will cause the framework's pipeline stage to not run.
+By default, if there are errors reported by the validation engine, it will cause the framework's pipeline to abort.
 You could still proceed with the installation, bearing in mind that things could go wrong in the configuration
 depending on the nature of the validation errors.
-To disable hard errors from the validation engine, you can open the simple cli script.
+To disable hard errors from the validation engine, you can edit the simple cli script:
 ```shell script
 vim ~/simple
 ``` 
-And then uncomment the lines that after "Uncomment the lines below..":
+And then find this line early in the script:
 ```shell script
-    # Uncomment the lines below to ignore validation engine errors
-    # echo "For now just exit 0..."
-    # exit 0
-
+validation_overrule=0
 ```
+Change it as follows:
+```
+validation_overrule=1
+```
+
 ### Can I add new machines, for instance WNs, after deploying a SIMPLE cluster?
 Yes, it is possible to add new LC hosts to your existing SIMPLE cluster. The instructions are about 10-15 steps per node
 at present and we are working to release them as a single command in our upcoming releases. Please [contact us](../help)
