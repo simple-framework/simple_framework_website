@@ -931,7 +931,7 @@ simple lc-stage
 ```
 **NOTE:** that command **has** to work, otherwise the remaining steps of the deployment will fail. If the command initially **fails**, usually it is due to Puppet still configuring Bolt in the background. In that case, wait a minute or two and try again. If it keeps failing, please get in touch.
 
-That output is rather verbose, showing various underlying Bolt details. A more pleasant way to check the stages of the CM and all LC hosts in one go is as follows:
+Its output is rather verbose, showing various underlying Bolt details. A more pleasant way to check the stages of the CM and all LC hosts in one go is as follows:
 ```shell script
 simple check-stage [ stage-name ]
 ```
