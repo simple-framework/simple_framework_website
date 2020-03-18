@@ -9,9 +9,9 @@ This tutorial describes setting up a production ready [HTCondor](https://researc
 The instructions below use some Puppet commands but they do not require any previous experience with Puppet. 
 
 We are rapidly taking feedback from the site admins and rolling out updated versions of the framework's components. To stay in loop, 
-please watch out for the 'announcements' channel in 
-[Slack](https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY)
-while we put together a Discourse forum. Please also bookmark the homepage as we plan to announce the Discourse forum there.
+please watch out for the 'Announcements' category in our [Discourse forum](https://simple-framework-talk.web.cern.ch/). 
+If you have any immediate questions while following the guide,
+feel free to connect with us on our [Slack](http://cern.ch/go/s7d7) workspace.
 
 ### Target Audience
 The target audience for this tutorial are WLCG Site admins who wish to :

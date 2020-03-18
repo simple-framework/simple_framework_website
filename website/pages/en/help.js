@@ -27,7 +27,7 @@ function Help(props) {
       title: 'Browse Docs',
     },
     {
-      content: `Ask any questions about the project on [Slack](https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY)`,
+      content: `Ask any questions about the project on [Slack](http://cern.ch/go/s7d7) or on our [Discussion Forum](https://simple-framework-talk.web.cern.ch/).`,
       title: 'Join the community',
     },
     {

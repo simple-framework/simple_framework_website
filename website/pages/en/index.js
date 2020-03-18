@@ -67,7 +67,6 @@ class HomeSplash extends React.Component {
             {/*<Button href="#try">Try It Out</Button>*/}
             {/*<Button href={docUrl('deployment_guide_htcondor.html')}> Learn More </Button>*/}
             <Button href="https://indico.cern.ch/event/869667/contributions/3670162/">Learn More</Button>
-            <Button href="https://join.slack.com/t/simple-framework/shared_invite/enQtODE4NzY2MTk2OTY0LWZmNjQ0NThmNDRiMzc1YTUxMzU3MTNjOGU4YWRlN2E0MzI5NjQ3ZDNjMDkxYjYzMjdkZGQyNzJjNmMwNzlmNWY">Slack</Button>
             <Button href="/docs/deployment_guide_htcondor">Deploy HTCondor</Button>
           </PromoSection>
         </div>
