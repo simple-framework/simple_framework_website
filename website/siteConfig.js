@@ -75,9 +75,8 @@ const siteConfig = {
     ],
     // For no header links in the top nav bar -> headerLinks: [],
     headerLinks: [
-        {doc: 'deployment_guide_htcondor', label: 'Docs'},
-        // {doc: 'doc4', label: 'API'},
         {href: 'https://simple-framework-talk.web.cern.ch/', label: 'Discourse'},
+        {doc: 'deployment_guide_htcondor', label: 'Docs'},
         {href: 'http://cern.ch/go/s7d7', label: 'Slack'},
         {href: 'https://github.com/simple-framework', label: 'GitHub'},
         {page: 'help', label: 'Help'},
