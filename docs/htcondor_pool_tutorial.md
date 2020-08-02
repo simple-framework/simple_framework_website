@@ -875,13 +875,13 @@ this tutorial. As always, please feel free to [get in touch with us](../help) to
 On your CM node, you will now see the certificate signing requests from LC hosts using:
  
 ```shell script
-puppet cert list -all
+puppetserver ca list -all
 ```
 
 Sign the certificate requests as follows:
 
 ```shell script
-puppet cert sign --all
+puppetserver ca sign --all
 ```
 
 **Note**: If you do not see any certificate signing requests, please check that Port 8140 is open on your CMs firewall 
