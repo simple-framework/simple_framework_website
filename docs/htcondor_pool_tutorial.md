@@ -157,7 +157,7 @@ If you are migrating from CREAM-CE, it is likely that you already have a local C
 If so, you can just re-use that for your HTCondor SIMPLE cluster. If not, please set up a CVMFS Squid proxy server on 
 a node that does not belong to the SIMPLE cluster.
 If you support Atlas or CMS, you'll have to setup a [Frontier Squid server](https://twiki.cern.ch/twiki/bin/view/Frontier/InstallSquid). 
-If not, then a regular Squid must be configured as described [here](http://cernvm.web.cern.ch/portal/cvmfs/examples).
+If not, then a regular Squid must be configured as described [here](https://cvmfs.readthedocs.io/en/stable/cpt-squid.html).
 
 #### SELinux
 After you have identified a CM node and appropriate LC nodes, you must ensure that SELinux is disabled on the nodes. 
