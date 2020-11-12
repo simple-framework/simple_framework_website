@@ -310,6 +310,7 @@ lightweight_components:
     supplemental_config:
       #Example of adding HTCondorCE configuration knobs through the site level configuration file.
       'htcondor-ce':
+        - TCP_FORWARDING_HOST = 123.45.67.89 # Public IPv4 address of the HTCondorCE host machine. Required only when your CE host has a public and a private network interface.
         - "MYVAR=VALUE"
         - ANOTHER_CONDOR_KNOB: VALUE
       'htcondor':
@@ -592,7 +593,7 @@ preferred_tech_stack:
 
 ### site_infrastructure
 In this section, you tell the framework about how to access the LC hosts. If any of your LC hosts have **multiple network interfaces**,
-please use the IP address that corresponds to the interface that can access all the other LC hosts in your network.
+please use the IP address that corresponds to the interface that can access all the other LC hosts in your network. Most likely, these addresses correspond to your private network interface. The public IPv4 address of your CE's host machine must be defined as TCP_FORWARDING_HOST supplemental config parameter for the HTCondorCE lightweight component. Please see the sample lightweight components section below for more info.
 
 For each LC host, you need to make an entry that consists of its fqdn and IPv4 address.
 For instance, the YAML object for a node simple-lc-node0.cern.ch with IPv4 address 188.184.104.25 would look as follows:
@@ -655,6 +656,8 @@ llightweight_components:
        condor_host_execution_id: 1
      supplemental_config:
        #Example of adding HTCondorCE configuration knobs through the site level configuration file.
+       # If you have a public and private network interface on the CE host machine, make sure the private address is used in the site-infrastructure section
+       # and add an entry for TCP_FORWARDING_HOST: {public_ip_address_of_ce_host} to the 'htcondor-ce' config below.
        'htcondor-ce':
          - "MYVAR=VALUE"
          - ANOTHER_CONDOR_KNOB: VALUE
